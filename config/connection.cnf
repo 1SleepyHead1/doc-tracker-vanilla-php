@@ -1,0 +1,4 @@
+servername = localhost
+databasename = db_document_tracker
+u = 'root'
+p =''

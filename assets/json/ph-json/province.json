@@ -1,0 +1,8 @@
+[
+	{ "province_code": "0604", "province_name": "Aklan", "psgc_code": "060400000", "region_code": "06" },
+	{ "province_code": "0606", "province_name": "Antique", "psgc_code": "060600000", "region_code": "06" },
+	{ "province_code": "0619", "province_name": "Capiz", "psgc_code": "061900000", "region_code": "06" },
+	{ "province_code": "0630", "province_name": "Iloilo", "psgc_code": "063000000", "region_code": "06" },
+	{ "province_code": "0645", "province_name": "Negros Occidental", "psgc_code": "064500000", "region_code": "06" },
+	{ "province_code": "0679", "province_name": "Guimaras", "psgc_code": "067900000", "region_code": "06" }
+]
