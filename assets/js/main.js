@@ -273,7 +273,7 @@ const validateDataListOptions = (elementId, elementDisplayId, list) => {
 			.val("")
 			.css("border-color", "red");
 
-		swalAlert("Error", "error", "danger", `Select a valid ${listType} from the provided list only.`, 1500);
+		showAlert(`Select a valid ${listType} from the provided list only.`, "danger");
 		setTimeout(function () {
 			$(`#${elementId}, #${elementDisplayId != "" ? elementDisplayId : null}`).css("border-color", "");
 		}, 3000);
@@ -343,7 +343,8 @@ const showAlert = (message, type = "success") => {
 			align: "right"
 		},
 		time: 1000,
-		delay: 0
+		delay: 0,
+		z_index: 2000 // Higher z-index to show above modals
 	});
 	removeAlert();
 };
@@ -364,42 +365,37 @@ const swalAlert = (title = "Success", icon = "success", className = "success", t
 				className: `btn btn-${className}`,
 				closeModal: true
 			}
+		},
+		position: "center",
+		willOpen: () => {
+			const sweetAlertContainer = document.querySelector(".swal-overlay");
+			if (sweetAlertContainer) {
+				sweetAlertContainer.style.zIndex = 1060;
+			}
 		}
 	});
 };
 
-const swalConfirmation = (text1 = "", title2, text2, id = null, f = null, timer = 3000) => {
+const swalConfirmation = (text, title, confirmText, id = null, callback = null, timer = 3000) => {
 	swal({
 		title: "Notice!",
-		text: text1,
+		text: text,
 		icon: "warning",
 		buttons: {
-			confirm: {
-				text: "Delete",
-				className: "btn btn-success"
-			},
 			cancel: {
 				visible: true,
 				className: "btn btn-danger"
+			},
+			confirm: {
+				text: "Delete",
+				className: "btn btn-success"
 			}
 		}
-	}).then((Delete) => {
-		if (Delete) {
-			swal({
-				timer: timer,
-				title: title2,
-				text: text2,
-				icon: "success",
-				buttons: {
-					confirm: {
-						className: "btn btn-success"
-					}
-				}
-			});
-			f(id);
-			playAlertSounds();
-		} else {
-			swal.close();
+	}).then((confirmed) => {
+		if (confirmed) {
+			if (callback) {
+				callback(id);
+			}
 		}
 	});
 };
@@ -416,9 +412,39 @@ const getPageHeader = (menu) => {
 	switch (menu) {
 		case "user-registry":
 			title = "Registry";
-			icon = "fas fa-address-card";
+			icon = "fas fa-book";
 			subTitle = "User Registry";
 			parent = "registry";
+			break;
+		case "user-account-registry":
+			title = "Registry";
+			icon = "fas fa-book";
+			subTitle = "User Account Registry";
+			parent = "registry";
+			break;
+		case "office-registry":
+			title = "Registry";
+			icon = "fas fa-book";
+			subTitle = "Office Registry";
+			parent = "registry";
+			break;
+		case "document-type-registry":
+			title = "Registry";
+			icon = "fas fa-book";
+			subTitle = "Document Type Registry";
+			parent = "registry";
+			break;
+		case "document-mapping":
+			title = "Settings";
+			icon = "fas fa-cog";
+			subTitle = "Document Transaction Setting";
+			parent = "settings";
+			break;
+		case "sms-notifications":
+			title = "Settings";
+			icon = "fas fa-cog";
+			subTitle = "SMS Notifications Setting";
+			parent = "settings";
 			break;
 		default:
 			title = "Dashboard";
@@ -841,7 +867,7 @@ const updateProfile = (id) => {
 	}
 
 	if (confirmPword != pword) {
-		swalAlert("Error", "error", "danger", "New and confirm password does not match.");
+		showAlert("New and confirm password does not match.", "danger");
 		return;
 	}
 
@@ -858,7 +884,7 @@ const updateProfile = (id) => {
 				showAlert("Password has been changed.");
 				toggleModal("user-profile-modal", 1);
 			} else {
-				swalAlert("Error", "error", "danger", data);
+				showAlert(data, "danger");
 			}
 		}
 	).fail(function (jqXHR, textStatus, errorThrown) {

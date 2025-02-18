@@ -2092,9 +2092,9 @@ body[data-background-color="dark"] .border-top {
 	display: inline;
 	width: auto;
 	border-left: 1px solid #efefef;
-	margin-left: 25px;
+	margin-left: -25px;
 	padding-left: 25px;
-	margin-bottom: 0;
+	/* margin-bottom: 0; */
 	padding-top: 8px;
 	padding-bottom: 8px;
 	height: 100%;
@@ -2107,7 +2107,7 @@ body[data-background-color="dark"] .border-top {
 	font-size: 13px;
 }
 .breadcrumbs li a i {
-	font-size: 16px;
+	font-size: 28px;
 }
 .breadcrumbs li a:hover {
 	text-decoration: none;

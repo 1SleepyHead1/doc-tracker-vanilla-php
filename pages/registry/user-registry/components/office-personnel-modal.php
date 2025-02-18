@@ -8,12 +8,29 @@ require_once "../../../../script/globals.php";
 try {
     $action = $_POST['action'];
     $id = $_POST['id'];
+
+    $getDetails = $c->prepare("
+        SELECT
+            first_name,
+            middle_name,
+            last_name,
+            extension,
+            email,
+            contact_no,
+            province,
+            city,
+            barangay
+        FROM users
+        WHERE is_office_personnel=1 AND id=?
+    ");
+    $getDetails->execute([$id]);
+    $details = $getDetails->fetch();
 ?>
 
     <div class="modal-header no-bd">
         <h5 class="modal-title">
             <i class="fas fa-user-plus me-2"></i>
-            Add New User
+            <?= $action == 0 ? "Add New User" : "Edit User" ?>
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
         </button>
@@ -27,29 +44,29 @@ try {
                 </div>
                 <div class="col-md-3">
                     <label for="first-name" class="form-label small">First Name</label>
-                    <input type="text" class="form-control form-control-sm" id="first-name" name="first-name" required>
+                    <input type="text" class="form-control form-control-md" id="first-name" name="first-name" value="<?= $action == 1 ? $details['first_name'] : '' ?>" required>
                 </div>
                 <div class="col-md-3">
                     <label for="middle-name" class="form-label small">Middle Name</label>
-                    <input type="text" class="form-control form-control-sm" id="middle-name" name="middle-name">
+                    <input type="text" class="form-control form-control-md" id="middle-name" name="middle-name" value="<?= $action == 1 ? $details['middle_name'] : '' ?>">
                 </div>
                 <div class="col-md-3">
                     <label for="last-name" class="form-label small">Last Name</label>
-                    <input type="text" class="form-control form-control-sm" id="last-name" name="last-name" required>
+                    <input type="text" class="form-control form-control-md" id="last-name" name="last-name" value="<?= $action == 1 ? $details['last_name'] : '' ?>" required>
                 </div>
                 <div class="col-md-3">
                     <label for="ext-name" class="form-label small">Extension</label>
-                    <input type="text" class="form-control form-control-sm" id="ext-name" name="ext-name">
+                    <input type="text" class="form-control form-control-md" id="ext-name" name="ext-name" value="<?= $action == 1 ? $details['extension'] : '' ?>">
                 </div>
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                     <label for="user-type" class="form-label small">Type</label>
-                    <select class="form-select form-select-sm" id="user-type" name="user-type" required>
+                    <select class="form-select form-control" id="user-type" name="user-type" required>
                         <option value="student">Student</option>
                         <option value="faculty">Faculty</option>
                         <option value="staff">Staff</option>
                         <option value="outside-client">Outside Client</option>
                     </select>
-                </div>
+                </div> -->
 
                 <!-- Contact & Address Information -->
                 <div class="col-md-12 mt-3 mb-2">
@@ -57,25 +74,25 @@ try {
                 </div>
                 <div class="col-md-3">
                     <label for="email" class="form-label small">Email</label>
-                    <input type="email" class="form-control form-control-sm" id="email" name="email" required>
+                    <input type="email" class="form-control form-control-md" id="email" name="email" value="<?= $action == 1 ? $details['email'] : '' ?>" required>
                 </div>
                 <div class="col-md-3">
                     <label for="contact-no" class="form-label small">Contact No.</label>
-                    <input type="tel" class="form-control form-control-sm" id="contact-no" name="contact-no" required>
+                    <input type="tel" class="form-control form-control-md" id="contact-no" name="contact-no" value="<?= $action == 1 ? $details['contact_no'] : '' ?>" required>
                 </div>
                 <div class="col-md-3">
                     <label for="province" class="form-label small">Province</label>
-                    <select class="form-select form-select-sm" id="province" name="province" onchange="loadCities()" required>
+                    <select class="form-select form-control" id="province" name="province" onchange="loadCities()" required>
                     </select>
                 </div>
                 <div class="col-md-3">
                     <label for="city" class="form-label small">City/Municipality</label>
-                    <select class="form-select form-select-sm" id="city" name="city" onchange="loadBarangays()" required>
+                    <select class="form-select form-control" id="city" name="city" onchange="loadBarangays()" required>
                     </select>
                 </div>
                 <div class="col-md-3">
                     <label for="barangay" class="form-label small">Barangay</label>
-                    <select class="form-select form-select-sm" id="barangay" name="barangay" required>
+                    <select class="form-select form-control" id="barangay" name="barangay" required>
                     </select>
                 </div>
             </div>
@@ -107,7 +124,7 @@ try {
 
                 <?php if ($action == 1) { ?>
                     if (!donorModalLoaded) {
-                        element.val("<?php echo $d['province'] ?>");
+                        element.val("<?= $details['province'] ?>");
                     }
                 <?php } ?>
 
@@ -137,7 +154,7 @@ try {
 
                 <?php if ($action == 1) { ?>
                     if (!donorModalLoaded) {
-                        element.val("<?php echo $d['city'] ?>");
+                        element.val("<?= $details['city'] ?>");
                     }
                 <?php } ?>
 
@@ -167,7 +184,7 @@ try {
 
                 <?php if ($action == 1) { ?>
                     if (!donorModalLoaded) {
-                        element.val("<?php echo $d['barangay'] ?>");
+                        element.val("<?= $details['barangay'] ?>");
                     }
                 <?php } ?>
             });
@@ -179,7 +196,7 @@ try {
 
         $("#user-registry-form").submit(function(e) {
             e.preventDefault();
-            <?php echo $action == 0 ? "insertUpdateUser(0);" : "updateUser(0,$id);" ?>
+            <?= $action == 0 ? "insertUpdateUser(0);" : "insertUpdateUser(1,$id);" ?>
         });
     </script>
 

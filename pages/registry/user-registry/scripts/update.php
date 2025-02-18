@@ -16,6 +16,7 @@ try {
         "staff" => "Staff",
         "outside-client" => "Outside Client"
     ];
+    $id = sanitize($_POST['id']);
     $firstName = ucfirst(sanitize($_POST['firstName']));
     $middleName = ucfirst(sanitize($_POST['middleName']));
     $lastName = ucfirst(sanitize($_POST['lastName']));
@@ -29,9 +30,9 @@ try {
     $address = "$province $city, $barangay";
     $email = sanitize($_POST['email']);
     $contactNumber = sanitize($_POST['contactNumber']);
-    $isOfficePersonnel = $userCategory === "office" ? 1 : 0;
-    $checkDuplicate = $c->prepare("SELECT id FROM users WHERE first_name = ? AND middle_name = ? AND last_name = ? AND extension = ?;");
-    $checkDuplicate->execute([$firstName, $middleName, $lastName, $extensionName]);
+
+    $checkDuplicate = $c->prepare("SELECT id FROM users WHERE first_name = ? AND middle_name = ? AND last_name = ? AND extension = ? AND id<>?;");
+    $checkDuplicate->execute([$firstName, $middleName, $lastName, $extensionName, $id]);
 
     if ($checkDuplicate->rowCount() > 0) {
         $response['status'] = false;
@@ -40,27 +41,25 @@ try {
         exit;
     }
 
-    $insert = $c->prepare("
-        INSERT INTO users(
-            user_type,
-            is_office_personnel,
-            first_name,
-            middle_name,
-            last_name,
-            extension,
-            name,
-            province,
-            city,
-            barangay,
-            address,
-            email,
-            contact_no
-        ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);
+    $update = $c->prepare("
+        UPDATE users SET
+            user_type = ?,
+            first_name = ?,
+            middle_name = ?,
+            last_name = ?,
+            extension = ?,
+            name = ?,
+            province = ?,
+            city = ?,
+            barangay = ?,
+            address = ?,
+            email = ?,
+            contact_no = ?
+        WHERE id = ?;
     ");
 
-    $insert->execute([
+    $update->execute([
         $userType,
-        $isOfficePersonnel,
         $firstName,
         $middleName,
         $lastName,
@@ -71,25 +70,21 @@ try {
         $barangay,
         $address,
         $email,
-        $contactNumber
+        $contactNumber,
+        $id
     ]);
-    $id = $c->lastInsertId();
 
-    $getTstamp = $c->prepare("SELECT tstamp FROM users WHERE id = ?");
-    $getTstamp->execute([$id]);
-    $tstamp = $getTstamp->fetchColumn(0);
 
     if ($response['status']) {
         $c->commit();
         $response['data'] = [
             'id' => $id,
-            'userType' => is_null($userType) ? "-" : $userTypes[$userType],
+            'userType' => $userTypes[$userType],
             'userCategory' => $userCategory,
             'name' => $name,
             'email' => $email,
             'contactNo' => $contactNumber,
             'address' => $address,
-            'tstamp' => $tstamp
         ];
     }
 } catch (PDOException $e) {

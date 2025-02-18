@@ -4,13 +4,23 @@ if (empty($_SESSION['user_id'])) {
 	session_destroy();
 	header('location: login.php');
 } else {
-	if ($_SESSION['is_admin'] == 0) {
-		header('location: index-u.php');
-	}
+	// if ($_SESSION['is_admin'] == 0) {
+	// 	header('location: index-u.php');
+	// }
 }
 
 require_once "conn.php";
 
+// $q = $c->prepare("
+//     SELECT
+//         	b.name AS user_name,
+// 			b.email,
+// 			b.first_name,
+// 			a.username
+//     FROM user_accounts a
+//     LEFT JOIN users b ON a.user_id = b.id
+//     WHERE a.is_admin = 1 AND a.id = ?
+// ");
 $q = $c->prepare("
     SELECT
         	b.name AS user_name,
@@ -19,7 +29,7 @@ $q = $c->prepare("
 			a.username
     FROM user_accounts a
     LEFT JOIN users b ON a.user_id = b.id
-    WHERE a.is_admin = 1 AND a.id = ?
+    WHERE a.id = ?
 ");
 $q->execute([$_SESSION['user_id']]);
 $userInfo = $q->fetch();
@@ -59,10 +69,10 @@ $userInfo = $q->fetch();
 <body>
 	<div class="wrapper">
 		<!-- Sidebar -->
-		<div class="sidebar" data-background-color="dark2">
+		<div class="sidebar" data-background-color="white">
 			<div class="sidebar-logo">
 				<!-- Logo Header -->
-				<div class="logo-header" data-background-color="dark2">
+				<div class="logo-header" data-background-color="white">
 					<a class="logo">
 						<!-- <img src="" alt="logo here" class="navbar-brand" height="32" /> -->
 					</a>
@@ -85,6 +95,7 @@ $userInfo = $q->fetch();
 			<div class="sidebar-wrapper scrollbar scrollbar-inner">
 				<div class="sidebar-content">
 					<ul class="nav nav-secondary">
+						<!-- dashboard -->
 						<li id="parent-dashboard" class="nav-item active">
 							<a data-bs-toggle="collapse" href="#dashboard">
 								<i class="fas fa-home"></i>
@@ -113,9 +124,10 @@ $userInfo = $q->fetch();
 							</span>
 						</li>
 
+						<!-- registry -->
 						<li id="parent-registry" class="nav-item">
 							<a data-bs-toggle="collapse" href="#registry">
-								<i class="fas fa-address-card"></i>
+								<i class="fas fa-book"></i>
 								<p>Registry</p>
 								<span class="caret"></span>
 							</a>
@@ -128,24 +140,58 @@ $userInfo = $q->fetch();
 
 									</li>
 									<li class="sub-menu cursor-pointer">
-										<a id="user-r-menu" data-parent="registry" data-url="pages/registry/user-r/user-r.php" onclick="loadMenu('views/registry/user-r/user-r.php','user-r')">
+										<a id="user-account-registry-menu" data-parent="registry" data-url="pages/registry/user-account-registry/user-account-registry.php" onclick="loadMenu('pages/registry/user-account-registry/user-account-registry.php','user-account-registry')">
 											<span class="sub-item">User Account Registry</span>
+										</a>
+									</li>
+									<li class="sub-menu cursor-pointer">
+										<a id="office-registry-menu" data-parent="registry" data-url="pages/registry/office-registry/office-registry.php" onclick="loadMenu('pages/registry/office-registry/office-registry.php','office-registry')">
+											<span class="sub-item">Office Registry</span>
+										</a>
+									</li>
+									<li class="sub-menu cursor-pointer">
+										<a id="document-type-registry-menu" data-parent="registry" data-url="pages/registry/document-type-registry/document-type-registry.php" onclick="loadMenu('pages/registry/document-type-registry/document-type-registry.php','document-type-registry')">
+											<span class="sub-item">Document Type Registry</span>
 										</a>
 									</li>
 								</ul>
 							</div>
 						</li>
 
-						<li id="parent-monitoring" class="nav-item">
-							<a data-bs-toggle="collapse" href="#monitoring">
+						<!-- settings -->
+						<li id="parent-settings" class="nav-item">
+							<a data-bs-toggle="collapse" href="#settings">
+								<i class="fas fa-cog"></i>
+								<p>Settings</p>
+								<span class="caret"></span>
+							</a>
+							<div class="collapse" id="settings">
+								<ul class="nav nav-collapse">
+									<li class="sub-menu cursor-pointer">
+										<a id="document-mapping-menu" data-parent="settings" data-url="pages/settings/document-mapping/document-mapping.php" onclick="loadMenu('pages/settings/document-mapping/document-mapping.php','document-mapping')">
+											<span class="sub-item">Document Transaction Setting</span>
+										</a>
+									</li>
+									<li class="sub-menu cursor-pointer">
+										<a id="sms-notifications-menu" data-parent="settings" data-url="pages/settings/sms-notifications/sms-notifications.php" onclick="loadMenu('pages/settings/sms-notifications/sms-notifications.php','sms-notifications')">
+											<span class="sub-item">SMS Notifications Setting</span>
+										</a>
+									</li>
+								</ul>
+							</div>
+						</li>
+
+						<!-- transactions -->
+						<li id="parent-transactions" class="nav-item">
+							<a data-bs-toggle="collapse" href="#transactions">
 								<i class="fas fa-clipboard-list"></i>
 								<p>Transactions</p>
 								<span class="caret"></span>
 							</a>
-							<div class="collapse" id="monitoring">
+							<div class="collapse" id="transactions">
 								<ul class="nav nav-collapse">
 									<li class="sub-menu cursor-pointer">
-										<a id="inventory-menu" data-parent="monitoring" data-url="pages/monitoring/inventory/inventory.php" onclick="loadMenu('views/monitoring/inventory/inventory.php','inventory')">
+										<a id="inventory-menu" data-parent="transactions" data-url="pages/transactions/inventory/inventory.php" onclick="loadMenu('pages/transactions/inventory/inventory.php','inventory')">
 											<span class="sub-item">Inventory</span>
 										</a>
 									</li>
@@ -153,6 +199,7 @@ $userInfo = $q->fetch();
 							</div>
 						</li>
 
+						<!-- reports -->
 						<li id="parent-reports" class="nav-item">
 							<a data-bs-toggle="collapse" href="#reports">
 								<i class="fas fa-copy"></i>
@@ -290,18 +337,20 @@ $userInfo = $q->fetch();
 				<div class="page-inner">
 					<!-- container header -->
 					<div class="page-header">
-						<h3 id="ph-title" class="fw-bold mb-3"></h3>
-						<ul class="breadcrumbs mb-3">
-							<li class="">
-								<a>
-									<i id="ph-icon" class=""></i>
+						<ul class="breadcrumbs d-flex align-items-center mb-3">
+							<li class="d-flex align-items-center">
+								<h3 id="ph-title" class="fw-bold mb-0 me-3"></h3>
+							</li>
+							<li class="d-flex align-items-center">
+								<a class="d-flex align-items-center">
+									<i id="ph-icon" class="me-3"></i>
 								</a>
 							</li>
-							<li class="separator">
-								<i class="icon-arrow-right"></i>
+							<li class="separator d-flex align-items-center">
+								<i class="fas fa-chevron-right mx-2"></i>
 							</li>
-							<li class="nav-item">
-								<a id="ph-sub-menu"></a>
+							<li class="nav-item d-flex align-items-center">
+								<a id="ph-sub-menu" class="text-muted"></a>
 							</li>
 						</ul>
 					</div>
@@ -327,7 +376,7 @@ $userInfo = $q->fetch();
 				</div>
 			</footer>
 
-			<!-- put glboal modals here -->
+			<!-- put global modals here -->
 
 			<!-- User Profile Modal -->
 			<form id="user-profile-form">
