@@ -2,6 +2,10 @@
 
 $(document).ready(function () {});
 
+// globals
+var docTypesDataTable = $("#tbl-doc-types").DataTable({});
+// end of globals
+
 function loadDocMapping(id) {
 	const parentElement = $("#_doc-map");
 

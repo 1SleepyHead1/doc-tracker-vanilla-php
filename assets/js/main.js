@@ -446,6 +446,12 @@ const getPageHeader = (menu) => {
 			subTitle = "SMS Notifications Setting";
 			parent = "settings";
 			break;
+		case "doc-submission":
+			title = "Transactions";
+			icon = "fas fa-receipt";
+			subTitle = "Document Submission";
+			parent = "transactions";
+			break;
 		default:
 			title = "Dashboard";
 			icon = "fas fa-home";
@@ -801,7 +807,7 @@ const loadMenu = (url, menu) => {
 
 const loadDefaultMenu = () => {
 	const menu = sessionStorage.getItem("menu");
-	console.log(menu);
+	// console.log(menu);
 
 	const subMenu = $(`#${menu}-menu`);
 	const parentSubMenu = subMenu.parent();

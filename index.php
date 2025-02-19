@@ -43,7 +43,7 @@ $userInfo = $q->fetch();
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title>Document Tracker</title>
 	<meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
-	<link rel="icon" href="" type="image/x-icon" />
+	<link rel="icon" href="assets/img/logo-no-text.png" type="image/x-icon" />
 	<script src="assets/js/plugin/webfont/webfont.min.js"></script>
 	<script>
 		WebFont.load({
@@ -74,7 +74,7 @@ $userInfo = $q->fetch();
 				<!-- Logo Header -->
 				<div class="logo-header" data-background-color="white">
 					<a class="logo">
-						<!-- <img src="" alt="logo here" class="navbar-brand" height="32" /> -->
+						<img src="assets/img/logo-menu.png" alt="logo here" class="navbar-brand" height="39" />
 					</a>
 					<div class="nav-toggle">
 						<button class="btn btn-toggle toggle-sidebar">
@@ -184,15 +184,15 @@ $userInfo = $q->fetch();
 						<!-- transactions -->
 						<li id="parent-transactions" class="nav-item">
 							<a data-bs-toggle="collapse" href="#transactions">
-								<i class="fas fa-clipboard-list"></i>
+								<i class="fas fas fa-receipt"></i>
 								<p>Transactions</p>
 								<span class="caret"></span>
 							</a>
 							<div class="collapse" id="transactions">
 								<ul class="nav nav-collapse">
 									<li class="sub-menu cursor-pointer">
-										<a id="inventory-menu" data-parent="transactions" data-url="pages/transactions/inventory/inventory.php" onclick="loadMenu('pages/transactions/inventory/inventory.php','inventory')">
-											<span class="sub-item">Inventory</span>
+										<a id="doc-submission-menu" data-parent="transactions" data-url="pages/transactions/doc-submission/doc-submission.php" onclick="loadMenu('pages/transactions/doc-submission/doc-submission.php','doc-submission')">
+											<span class="sub-item">Document Submission</span>
 										</a>
 									</li>
 								</ul>
@@ -233,9 +233,9 @@ $userInfo = $q->fetch();
 			<div class="main-header">
 				<div class="main-header-logo">
 					<!-- Logo Header -->
-					<div class="logo-header" data-background-color="dark2">
+					<div class="logo-header" data-background-color="white">
 						<a class="logo">
-							<!-- <img src="assets/img/logo-main.png" alt="logo here" class="navbar-brand" height="32" /> -->
+							<img src="assets/img/logo-menu.png" alt="logo here" class="navbar-brand" height="39" />
 						</a>
 						<div class="nav-toggle">
 							<button class="btn btn-toggle toggle-sidebar">

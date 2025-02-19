@@ -34,7 +34,7 @@ try {
 ?>
     <datalist id="office-personnel-list">
         <?php foreach ($officePersonnels as $officePersonnel) { ?>
-            <option data-id="<?= $officePersonnel['id'] ?>" value="<?= $officePersonnel['name'] ?>"><?= $officePersonnel['name'] ?></option>
+            <option data-id="<?= $officePersonnel['id'] ?>" value="<?= $officePersonnel['name'] ?>"></option>
         <?php } ?>
     </datalist>
 

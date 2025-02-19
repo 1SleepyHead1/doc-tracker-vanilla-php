@@ -43,18 +43,21 @@ try {
             </button>
         </div>
         <ul class="timeline expanded-timeline">
-            <?php foreach ($settings as $setting) { ?>
-                <li>
+            <?php foreach ($settings as $index => $setting) {
+
+            ?>
+                <li class="<?= $index % 2 == 0 ? "" : "timeline-inverted"  ?>">
                     <div class="timeline-panel">
                         <div class="timeline-heading">
-                            <h4 class="timeline-title"><i class="fas fa-building"></i> <?= $setting['office_code'] ?> - <?= $setting['office_name'] ?></h4>
+                            <h4 class="timeline-title"><i class="fas fa-map-pin"></i> <?= $setting['office_code'] ?> - <?= $setting['office_name'] ?></h4>
                         </div>
                         <div class="timeline-body">
                             <p><?= is_null($setting['name']) ? "-" : $setting['name'] ?></p>
                         </div>
                     </div>
-                    <div class="timeline-badge success"><?= $setting['step'] ?></div>
+                    <div class="timeline-badge"><?= $setting['step'] ?></div>
                 </li>
+
             <?php } ?>
         </ul>
     <?php } ?>

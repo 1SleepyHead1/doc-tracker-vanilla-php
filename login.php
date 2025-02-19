@@ -17,7 +17,7 @@ if (!empty($_SESSION['user_id'])) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Document Tracker</title>
     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
-    <link rel="icon" href="" type="image/x-icon" />
+    <link rel="icon" href="assets/img/logo-no-text.png" type="image/x-icon" />
 
     <script src="assets/js/plugin/webfont/webfont.min.js"></script>
     <script>
@@ -67,7 +67,7 @@ if (!empty($_SESSION['user_id'])) {
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-md-9 col-lg-6 col-xl-5">
                     <!-- logo image here -->
-                    <!-- <img src="" class="img-fluid" alt="Sample image"> -->
+                    <img src="assets/img/official-logo.png" class="img-fluid" alt="login-img">
                 </div>
                 <div class="col-md-8 col-lg-6 col-xl-3 offset-xl-1">
                     <div class="card shadow-sm">
@@ -118,7 +118,7 @@ if (!empty($_SESSION['user_id'])) {
             </div>
         </div>
         <footer class="bg-light text-center text-lg-start fixed-bottom">
-            <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+            <div class="text-center p-3" style="background-color: #fff;">
                 © <script>
                     document.write(new Date().getFullYear())
                 </script> All Rights Reserved

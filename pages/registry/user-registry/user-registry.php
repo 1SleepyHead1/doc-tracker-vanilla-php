@@ -78,7 +78,6 @@ try {
                                     <th>Email</th>
                                     <th>Contact No.</th>
                                     <th>Address</th>
-                                    <!-- <th>Status</th> -->
                                     <th>Date Created</th>
                                     <th>Action</th>
                                 </tr>
@@ -119,7 +118,6 @@ try {
                                     <th>Email</th>
                                     <th>Contact No.</th>
                                     <th>Address</th>
-                                    <!-- <th>Status</th> -->
                                     <th>Date Created</th>
                                     <th>Action</th>
                                 </tr>
@@ -132,7 +130,6 @@ try {
                                         <td><?= $nonOfficePersonnel['email']; ?></td>
                                         <td><?= $nonOfficePersonnel['contact_no']; ?></td>
                                         <td><?= $nonOfficePersonnel['address']; ?></td>
-                                        <!-- <td><span class="badge bg-success">Active</span></td> -->
                                         <td><?= date("M. d, Y h:i A", strtotime($nonOfficePersonnel['tstamp'])) ?></td>
                                         <td>
                                             <div class="btn-group">

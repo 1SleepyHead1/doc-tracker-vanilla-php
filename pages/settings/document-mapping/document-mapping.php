@@ -15,7 +15,7 @@ try {
     $getOffices->execute();
     $offices = $getOffices->fetchAll();
 ?>
-    <datalist id="office-list" data="<?= json_encode($offices) ?>">
+    <datalist id="office-list">
         <?php foreach ($offices as $office) { ?>
             <option data-id="<?= $office['id'] ?>" value="<?= $office['office_code'] . " [" . $office['office_name'] . "]" ?>"></option>
         <?php } ?>
@@ -23,8 +23,10 @@ try {
     <div class="container">
         <div class="row">
             <div class="col-md-6">
-                <h3><i class="fas fa-file-alt"></i> Document Types</h3>
                 <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-file-alt"></i> Document Types</h4>
+                    </div>
                     <div class="card-body table-responsive">
                         <table id="tbl-doc-types" class="table table-hover table-sm">
                             <thead>
@@ -50,10 +52,14 @@ try {
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <h3><i class="fas fa-list-ul"></i> Setting</h3>
-                <div id="_doc-map">
-                    <!-- show mapping here -->
+            <div class="col-md-6 overflow-auto" style="max-height: 999px;">
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-list-ul"></i> Setting</h4>
+                    </div>
+                    <div class="card-body" id="_doc-map">
+                        <!-- show mapping here -->
+                    </div>
                 </div>
 
                 <style>
@@ -76,7 +82,6 @@ try {
                         line-height: 50px;
                         text-align: center;
                         border-radius: 50%;
-                        background-color: #007bff;
                         color: white;
                         font-weight: bold;
                         margin-top: 10px;

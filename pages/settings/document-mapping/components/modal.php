@@ -59,7 +59,7 @@ try {
                         </tr>
                     <?php } else { ?>
                         <?php foreach ($details as $setting) { ?>
-                            <tr>
+                            <tr class="text-center fs-bold">
                                 <td><?= $setting['step'] ?></td>
                                 <td>
                                     <input type="text" id="office-list-input-<?= $setting['step'] ?>" class="form-control form-control-md" list="office-list" data-list-type="office" value="<?= $setting['office_code'] . " [" . $setting['office_name'] . "]" ?>" onchange="validateDataListOptions('office-list-input-<?= $setting['step'] ?>','','office-list');" required>
