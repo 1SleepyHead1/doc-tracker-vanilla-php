@@ -87,16 +87,31 @@ function getRemainingDays($targetDate)
     return $remainingDays;
 }
 
-function saveItemLogs($c, $externalDonation, $externalDonationNo, $externalDonationD, $donationD, $donor, $item, $quantity, $expiry)
+function generateDocNo($length = 15)
 {
-    $q = $c->prepare("INSERT INTO external_d_items_logs(external_d_s,external_donation_no,external_d_d,donation_d,donor,item,quantity,expiry_date) VALUES(?,?,?,?,?,?,?,?)");
-    $q->execute([$externalDonation, $externalDonationNo, $externalDonationD, $donationD, $donor, $item, $quantity, $expiry]);
+    $prefix = "";
+    $uniqueString = substr(md5(uniqid(mt_rand() . microtime(), true)), 0, $length - strlen($prefix));
+    return $prefix . $uniqueString;
 }
 
-function getLogsDonated($c, $externalDonation, $externalDonationD, $donationD, $item, $expiry)
+function imgToBlob($imgPath)
 {
-    $q = $c->prepare("SELECT quantity FROM external_d_items_logs WHERE  external_d_s = ? AND external_d_d = ? AND donation_d = ? AND item = ? AND expiry_date = ?");
-    $q->execute([$externalDonation, $externalDonationD, $donationD, $item, $expiry]);
+    $imgData = file_get_contents($imgPath);
+    $imgBlob = 'data:image/' . pathinfo($imgPath, PATHINFO_EXTENSION) . ';base64,' . base64_encode($imgData);
+    return $imgBlob;
+}
 
-    return $q->fetchColumn() ?? 0;
+function saveDocTransactionLogs($c, $docNo, $step = 0, $status = "New", $office = null, $updatedBy = null, $remarks = null)
+{
+    $query = $c->prepare("
+        INSERT INTO document_transaction_logs(
+            doc_number,
+            step,
+            status,
+            office,
+            updated_by,
+            remarks
+        ) VALUES(?,?,?,?,?,?);
+    ");
+    $query->execute([$docNo, $step, $status, $office, $updatedBy, $remarks]);
 }

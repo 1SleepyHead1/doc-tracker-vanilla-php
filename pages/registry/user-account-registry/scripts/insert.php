@@ -19,7 +19,7 @@ try {
 
     $checkUser = $c->prepare("SELECT id FROM user_accounts WHERE username = ?");
     $checkUser->execute([$username]);
-    $userExists = $checkUser->fetchColumn(0);
+    $userExists = $checkUser->fetchColumn();
 
     if ($userExists) {
         $response['status'] = false;
@@ -42,7 +42,7 @@ try {
 
     $getTstamp = $c->prepare("SELECT tstamp FROM user_accounts WHERE id = ?");
     $getTstamp->execute([$id]);
-    $tstamp = $getTstamp->fetchColumn(0);
+    $tstamp = $getTstamp->fetchColumn();
 
     if ($response['status']) {
         $c->commit();

@@ -22,7 +22,7 @@ try {
         <div class="card">
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h4 class="card-title"><i class="fas fa-file-alt me-2"></i>Document Type Registry</h4>
+                    <h4 class="card-title"><i class="fas fa-file-signature me-2"></i>Document Type Registry</h4>
                     <button class="btn btn-primary btn-round ms-auto" data-bs-toggle="modal" onclick="showModal(0)">
                         <i class="fas fa-plus-circle me-2"></i>
                         Add Document Type

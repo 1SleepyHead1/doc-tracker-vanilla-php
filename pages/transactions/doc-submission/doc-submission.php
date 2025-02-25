@@ -12,6 +12,7 @@ try {
             doc.id,
             doc.doc_number,
             doc_type.doc_type_name AS doc_type,
+            doc.purpose, 
             doc.status,
             user.name AS submitter,
             doc.tstamp
@@ -23,7 +24,7 @@ try {
     $getDocuments->execute();
     $documents  = $getDocuments->fetchAll();
 
-    $getSubmitters = $c->prepare("SELECT  id, name FROM users WHERE id<>1 ORDER BY name;");
+    $getSubmitters = $c->prepare("SELECT id, name FROM users WHERE id<>1 ORDER BY name;");
     $getSubmitters->execute();
     $submitters = $getSubmitters->fetchAll();
 ?>
@@ -52,20 +53,34 @@ try {
                                     <th>Document No.</th>
                                     <th>Type</th>
                                     <th>Submitter</th>
+                                    <th>Purpose</th>
                                     <th>Status</th>
-                                    <th>Date Created</th>
+                                    <th>Date Submitted</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ($documents as $doc) { ?>
-                                    <tr class="cursor-pointer text-center" data-id="<?= $docType['id'] ?>" data-id-no="<?= $docType['doc_no'] ?>" onclick="">
-                                        <td><?= $docType['doc_number'] ?></td>
-                                        <td><?= $docType['doc_type'] ?></td>
-                                        <td><?= $docType['submitter'] ?></td>
-                                        <td><span class="badge bg-success">New</span></td>
+                                    <tr id="tr-doc-<?= $doc['id'] ?>" class="cursor-pointer" data-id="<?= $doc['id'] ?>" data-id-no="<?= $doc['doc_number'] ?>" onclick="">
+                                        <td><?= $doc['doc_number'] ?></td>
+                                        <td><?= $doc['doc_type'] ?></td>
+                                        <td><?= $doc['submitter'] ?></td>
+                                        <td><?= $doc['purpose'] ?></td>
+                                        <td><?= $doc['status'] ?></td>
                                         <td><?= date("M. d, Y h:i A", strtotime($doc['tstamp'])) ?></td>
-                                        <td></td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-icon btn-clean me-0" type="button" id="dropdown-menu-button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <ul class="dropdown-menu" style="font-size: 1.1em;">
+                                                    <li><a class="dropdown-item" onclick="showDocStats('<?= $doc['doc_number'] ?>')">View Document</a></li>
+                                                    <li><a class="dropdown-item" onclick="showQRCode(<?= $doc['id'] ?>)">Show QR Code</a></li>
+                                                    <li><a class="dropdown-item" onclick="showModal(1, <?= $doc['id'] ?>)">Edit</a></li>
+                                                    <li><a class="dropdown-item text-danger" onclick="deleteDocument(<?= $doc['id'] ?>)">Delete</a></li>
+                                                </ul>
+                                            </div>
+                                        </td>
                                     </tr>
                                 <?php } ?>
                             </tbody>
@@ -122,6 +137,15 @@ try {
         <div class="modal-dialog modal-sm" role="document">
             <div id="_modal-content" class="modal-content modal-reset">
                 <!-- show modal content here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code View Modal -->
+    <div class="modal fade" id="qr-code-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-md" role="document">
+            <div id="_qr_modal_content" class="modal-content modal-reset">
+                <!-- show qr modal content here -->
             </div>
         </div>
     </div>

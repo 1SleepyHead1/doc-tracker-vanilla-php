@@ -16,7 +16,7 @@ try {
 
     <div class="modal-header no-bd">
         <h5 class="modal-title">
-            <i class="fas fa-file-alt me-2"></i>
+            <i class="fas fa-file-signature me-2"></i>
             <?= $action == 0 ? "Add New Document Type" : "Update Document Type" ?>
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">

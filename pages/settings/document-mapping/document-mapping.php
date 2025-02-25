@@ -25,7 +25,7 @@ try {
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
-                        <h4><i class="fas fa-file-alt"></i> Document Types</h4>
+                        <h4><i class="fas fa-file-signature"></i> Document Types</h4>
                     </div>
                     <div class="card-body table-responsive">
                         <table id="tbl-doc-types" class="table table-hover table-sm">

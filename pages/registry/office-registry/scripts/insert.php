@@ -17,11 +17,11 @@ try {
 
     $checkOfficeCode = $c->prepare("SELECT id FROM offices WHERE LOWER(office_code) = LOWER(?)");
     $checkOfficeCode->execute([$officeCode]);
-    $officeCodeExists = $checkOfficeCode->fetchColumn(0);
+    $officeCodeExists = $checkOfficeCode->fetchColumn();
 
     $checkOfficeName = $c->prepare("SELECT id FROM offices WHERE LOWER(office_name) = LOWER(?)");
     $checkOfficeName->execute([$officeName]);
-    $officeNameExists = $checkOfficeName->fetchColumn(0);
+    $officeNameExists = $checkOfficeName->fetchColumn();
 
     if ($officeCodeExists || $officeNameExists) {
         $response['status'] = false;
@@ -47,7 +47,7 @@ try {
 
     $getTstamp = $c->prepare("SELECT tstamp FROM offices WHERE id = ?");
     $getTstamp->execute([$id]);
-    $tstamp = $getTstamp->fetchColumn(0);
+    $tstamp = $getTstamp->fetchColumn();
 
     if ($response['status']) {
         $c->commit();

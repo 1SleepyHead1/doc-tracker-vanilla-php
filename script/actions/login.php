@@ -16,7 +16,7 @@ try {
     $getUser = $c->prepare("
         SELECT 
             acc.id AS user_account_id, 
-            acc.id as user_id, 
+            user.id as user_id, 
             acc.is_admin,
             user.user_type,
             user.is_office_personnel 

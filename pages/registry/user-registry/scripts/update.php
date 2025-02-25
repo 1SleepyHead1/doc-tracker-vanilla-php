@@ -23,7 +23,7 @@ try {
     $extensionName = sanitize($_POST['extensionName']);
     $userCategory = sanitize($_POST['userCategory']);
     $userType = $userCategory === "office" ? null : sanitize($_POST['userType']);
-    $name = "$firstName $middleName $lastName $extensionName";
+    $name = $extensionName == "" ? "$firstName $middleName $lastName" : "$firstName $middleName $lastName $extensionName";
     $province = sanitize($_POST['province']);
     $city = sanitize($_POST['city']);
     $barangay = sanitize($_POST['barangay']);

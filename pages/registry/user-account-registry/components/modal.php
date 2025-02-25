@@ -93,6 +93,15 @@ try {
                     $("#confirm-password-error").html("Passwords do not match");
                 }
             });
+
+            $(`input[type="text"], input[type="password"]`).on("input", function(e) {
+                const val = $(this).val();
+
+                if (/\s/.test(val)) {
+                    showAlert("Please don't include whitespaces.", "danger");
+                    $(this).val(val.replace(/\s+/g, ''));
+                }
+            })
         });
 
         function togglePassword(inputId) {

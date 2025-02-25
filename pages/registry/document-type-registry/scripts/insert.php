@@ -13,11 +13,15 @@ try {
     $docTypeCode = sanitize($_POST['docTypeCode']);
     $docTypeName = sanitize($_POST['docTypeName']);
 
-    $checkDocType = $c->prepare("SELECT id FROM document_types WHERE LOWER(doc_type_code) = LOWER(?) AND LOWER(doc_type_name) = LOWER(?)");
-    $checkDocType->execute([$docTypeCode, $docTypeName]);
-    $docTypeExists = $checkDocType->fetchColumn(0);
+    $checkDocTypeCode = $c->prepare("SELECT id FROM document_types WHERE LOWER(doc_type_code) = LOWER(?)");
+    $checkDocTypeCode->execute([$docTypeCode]);
+    $docTypeCodeExists = $checkDocTypeCode->fetchColumn();
 
-    if ($docTypeExists) {
+    $checkDocTypeName = $c->prepare("SELECT id FROM document_types WHERE LOWER(doc_type_name) = LOWER(?)");
+    $checkDocTypeName->execute([$docTypeName]);
+    $docTypeNameExists = $checkDocTypeName->fetchColumn();
+
+    if ($docTypeCodeExists || $docTypeNameExists) {
         $response['status'] = false;
         $response['message'] = 'Document type already exists.';
 
@@ -40,7 +44,7 @@ try {
 
     $getTstamp = $c->prepare("SELECT tstamp FROM document_types WHERE id = ?");
     $getTstamp->execute([$id]);
-    $tstamp = $getTstamp->fetchColumn(0);
+    $tstamp = $getTstamp->fetchColumn();
 
     if ($response['status']) {
         $c->commit();

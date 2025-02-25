@@ -95,133 +95,170 @@ $userInfo = $q->fetch();
 			<div class="sidebar-wrapper scrollbar scrollbar-inner">
 				<div class="sidebar-content">
 					<ul class="nav nav-secondary">
-						<!-- dashboard -->
-						<li id="parent-dashboard" class="nav-item active">
-							<a data-bs-toggle="collapse" href="#dashboard">
-								<i class="fas fa-home"></i>
-								<p>Dashboard</p>
-								<span class="caret"></span>
-							</a>
-							<div class="collapse show" id="dashboard">
-								<ul class="nav nav-collapse">
-									<li class="sub-menu cursor-pointer active">
-										<a id="default-menu" data-parent="dashboard" data-url="pages/dashboard/admin-d/admin-d.php" onclick="loadMenu('views/dashboard/admin-d/admin-d.php','default')">
-											<span class="sub-item">Home Panel</span>
-										</a>
-									</li>
-									<li class="sub-menu cursor-pointer">
-										<a id="statistics-menu" data-parent="dashboard" data-url="pages/dashboard/statistics/statistics.php" onclick="loadMenu('views/dashboard/statistics/statistics.php','statistics')">
-											<span class="sub-item">Statistics</span>
-										</a>
-									</li>
-								</ul>
-							</div>
-						</li>
+						<?php if ($_SESSION['is_admin'] == 0) { ?>
+							<?php if ($_SESSION['is_office_personnel'] == 0) { ?>
 
-						<li class="nav-section">
-							<span class="sidebar-mini-icon">
-								<i class="fa fa-ellipsis-h"></i>
-							</span>
-						</li>
+							<?php } else { ?>
+								<!-- office personnel dashboard -->
+								<li id="parent-dashboard" class="nav-item active">
+									<a data-bs-toggle="collapse" href="#dashboard">
+										<i class="fas fa-home"></i>
+										<p>Dashboard</p>
+										<span class="caret"></span>
+									</a>
+									<div class="collapse show" id="dashboard">
+										<ul class="nav nav-collapse">
+											<li class="sub-menu cursor-pointer active">
+												<a id="default-menu" data-parent="dashboard" data-url="pages/dashboard/admin-dashboard/admin-dashboard.php" onclick="loadMenu('pages/dashboard/admin-dashboard/admin-dashboard.php','default')">
+													<span class="sub-item">Home Panel</span>
+												</a>
+											</li>
+										</ul>
+									</div>
+								</li>
 
-						<!-- registry -->
-						<li id="parent-registry" class="nav-item">
-							<a data-bs-toggle="collapse" href="#registry">
-								<i class="fas fa-book"></i>
-								<p>Registry</p>
-								<span class="caret"></span>
-							</a>
-							<div class="collapse" id="registry">
-								<ul class="nav nav-collapse">
-									<li class="sub-menu cursor-pointer">
-										<a id="user-registry-menu" data-parent="registry" data-url="pages/registry/user-registry/user-registry.php" onclick="loadMenu('pages/registry/user-registry/user-registry.php','user-registry')">
-											<span class="sub-item">User Registry</span>
-										</a>
+								<!-- office personnel transactions -->
+								<li id="parent-transactions" class="nav-item">
+									<a data-bs-toggle="collapse" href="#transactions">
+										<i class="fas fas fa-receipt"></i>
+										<p>Transactions</p>
+										<span class="caret"></span>
+									</a>
+									<div class="collapse" id="transactions">
+										<ul class="nav nav-collapse">
+											<li class="sub-menu cursor-pointer">
+												<a id="doc-submission-menu" data-parent="transactions" data-url="pages/transactions/doc-submission/doc-submission.php" onclick="loadMenu('pages/transactions/doc-submission/doc-submission.php','doc-submission')">
+													<span class="sub-item">Document Submission</span>
+												</a>
+											</li>
+										</ul>
+									</div>
+								</li>
+							<?php } ?>
+						<?php } else { ?>
+							<!-- dashboard -->
+							<li id="parent-dashboard" class="nav-item active">
+								<a data-bs-toggle="collapse" href="#dashboard">
+									<i class="fas fa-home"></i>
+									<p>Dashboard</p>
+									<span class="caret"></span>
+								</a>
+								<div class="collapse show" id="dashboard">
+									<ul class="nav nav-collapse">
+										<li class="sub-menu cursor-pointer active">
+											<a id="default-menu" data-parent="dashboard" data-url="pages/dashboard/admin-dashboard/admin-dashboard.php" onclick="loadMenu('pages/dashboard/admin-dashboard/admin-dashboard.php','default')">
+												<span class="sub-item">Home Panel</span>
+											</a>
+										</li>
+									</ul>
+								</div>
+							</li>
 
-									</li>
-									<li class="sub-menu cursor-pointer">
-										<a id="user-account-registry-menu" data-parent="registry" data-url="pages/registry/user-account-registry/user-account-registry.php" onclick="loadMenu('pages/registry/user-account-registry/user-account-registry.php','user-account-registry')">
-											<span class="sub-item">User Account Registry</span>
-										</a>
-									</li>
-									<li class="sub-menu cursor-pointer">
-										<a id="office-registry-menu" data-parent="registry" data-url="pages/registry/office-registry/office-registry.php" onclick="loadMenu('pages/registry/office-registry/office-registry.php','office-registry')">
-											<span class="sub-item">Office Registry</span>
-										</a>
-									</li>
-									<li class="sub-menu cursor-pointer">
-										<a id="document-type-registry-menu" data-parent="registry" data-url="pages/registry/document-type-registry/document-type-registry.php" onclick="loadMenu('pages/registry/document-type-registry/document-type-registry.php','document-type-registry')">
-											<span class="sub-item">Document Type Registry</span>
-										</a>
-									</li>
-								</ul>
-							</div>
-						</li>
+							<li class="nav-section">
+								<span class="sidebar-mini-icon">
+									<i class="fa fa-ellipsis-h"></i>
+								</span>
+							</li>
 
-						<!-- settings -->
-						<li id="parent-settings" class="nav-item">
-							<a data-bs-toggle="collapse" href="#settings">
-								<i class="fas fa-cog"></i>
-								<p>Settings</p>
-								<span class="caret"></span>
-							</a>
-							<div class="collapse" id="settings">
-								<ul class="nav nav-collapse">
-									<li class="sub-menu cursor-pointer">
-										<a id="document-mapping-menu" data-parent="settings" data-url="pages/settings/document-mapping/document-mapping.php" onclick="loadMenu('pages/settings/document-mapping/document-mapping.php','document-mapping')">
-											<span class="sub-item">Document Transaction Setting</span>
-										</a>
-									</li>
-									<li class="sub-menu cursor-pointer">
-										<a id="sms-notifications-menu" data-parent="settings" data-url="pages/settings/sms-notifications/sms-notifications.php" onclick="loadMenu('pages/settings/sms-notifications/sms-notifications.php','sms-notifications')">
-											<span class="sub-item">SMS Notifications Setting</span>
-										</a>
-									</li>
-								</ul>
-							</div>
-						</li>
+							<!-- registry -->
+							<li id="parent-registry" class="nav-item">
+								<a data-bs-toggle="collapse" href="#registry">
+									<i class="fas fa-book"></i>
+									<p>Registry</p>
+									<span class="caret"></span>
+								</a>
+								<div class="collapse" id="registry">
+									<ul class="nav nav-collapse">
+										<li class="sub-menu cursor-pointer">
+											<a id="user-registry-menu" data-parent="registry" data-url="pages/registry/user-registry/user-registry.php" onclick="loadMenu('pages/registry/user-registry/user-registry.php','user-registry')">
+												<span class="sub-item">User Registry</span>
+											</a>
 
-						<!-- transactions -->
-						<li id="parent-transactions" class="nav-item">
-							<a data-bs-toggle="collapse" href="#transactions">
-								<i class="fas fas fa-receipt"></i>
-								<p>Transactions</p>
-								<span class="caret"></span>
-							</a>
-							<div class="collapse" id="transactions">
-								<ul class="nav nav-collapse">
-									<li class="sub-menu cursor-pointer">
-										<a id="doc-submission-menu" data-parent="transactions" data-url="pages/transactions/doc-submission/doc-submission.php" onclick="loadMenu('pages/transactions/doc-submission/doc-submission.php','doc-submission')">
-											<span class="sub-item">Document Submission</span>
-										</a>
-									</li>
-								</ul>
-							</div>
-						</li>
+										</li>
+										<li class="sub-menu cursor-pointer">
+											<a id="user-account-registry-menu" data-parent="registry" data-url="pages/registry/user-account-registry/user-account-registry.php" onclick="loadMenu('pages/registry/user-account-registry/user-account-registry.php','user-account-registry')">
+												<span class="sub-item">User Account Registry</span>
+											</a>
+										</li>
+										<li class="sub-menu cursor-pointer">
+											<a id="office-registry-menu" data-parent="registry" data-url="pages/registry/office-registry/office-registry.php" onclick="loadMenu('pages/registry/office-registry/office-registry.php','office-registry')">
+												<span class="sub-item">Office Registry</span>
+											</a>
+										</li>
+										<li class="sub-menu cursor-pointer">
+											<a id="document-type-registry-menu" data-parent="registry" data-url="pages/registry/document-type-registry/document-type-registry.php" onclick="loadMenu('pages/registry/document-type-registry/document-type-registry.php','document-type-registry')">
+												<span class="sub-item">Document Type Registry</span>
+											</a>
+										</li>
+									</ul>
+								</div>
+							</li>
 
-						<!-- reports -->
-						<li id="parent-reports" class="nav-item">
-							<a data-bs-toggle="collapse" href="#reports">
-								<i class="fas fa-copy"></i>
-								<p>Reports</p>
-								<span class="caret"></span>
-							</a>
-							<div class="collapse" id="reports">
-								<ul class="nav nav-collapse">
-									<li class="sub-menu cursor-pointer">
-										<a id="cash-d-report-menu" data-parent="reports" data-url="pages/reports/cash-d-report/cash-d-report.php" onclick="loadMenu('views/reports/cash-d-report/cash-d-report.php','cash-d-report')">
-											<span class="sub-item">Cash Donation Report</span>
-										</a>
-									</li>
+							<!-- settings -->
+							<li id="parent-settings" class="nav-item">
+								<a data-bs-toggle="collapse" href="#settings">
+									<i class="fas fa-cog"></i>
+									<p>Settings</p>
+									<span class="caret"></span>
+								</a>
+								<div class="collapse" id="settings">
+									<ul class="nav nav-collapse">
+										<li class="sub-menu cursor-pointer">
+											<a id="document-mapping-menu" data-parent="settings" data-url="pages/settings/document-mapping/document-mapping.php" onclick="loadMenu('pages/settings/document-mapping/document-mapping.php','document-mapping')">
+												<span class="sub-item">Document Transaction Setting</span>
+											</a>
+										</li>
+										<li class="sub-menu cursor-pointer">
+											<a id="sms-notifications-menu" data-parent="settings" data-url="pages/settings/sms-notifications/sms-notifications.php" onclick="loadMenu('pages/settings/sms-notifications/sms-notifications.php','sms-notifications')">
+												<span class="sub-item">SMS Notifications Setting</span>
+											</a>
+										</li>
+									</ul>
+								</div>
+							</li>
 
-									<li class="sub-menu cursor-pointer">
-										<a id="inkind-d-report-menu" data-parent="reports" data-url="pages/reports/inkind-d-report/inkind-d-report.php" onclick="loadMenu('views/reports/inkind-d-report/inkind-d-report.php','inkind-d-report')">
-											<span class="sub-item">In-kind Donation Report</span>
-										</a>
-									</li>
-								</ul>
-							</div>
-						</li>
+							<!-- transactions -->
+							<li id="parent-transactions" class="nav-item">
+								<a data-bs-toggle="collapse" href="#transactions">
+									<i class="fas fas fa-receipt"></i>
+									<p>Transactions</p>
+									<span class="caret"></span>
+								</a>
+								<div class="collapse" id="transactions">
+									<ul class="nav nav-collapse">
+										<li class="sub-menu cursor-pointer">
+											<a id="doc-submission-menu" data-parent="transactions" data-url="pages/transactions/doc-submission/doc-submission.php" onclick="loadMenu('pages/transactions/doc-submission/doc-submission.php','doc-submission')">
+												<span class="sub-item">Document Submission</span>
+											</a>
+										</li>
+									</ul>
+								</div>
+							</li>
+
+							<!-- reports -->
+							<li id="parent-reports" class="nav-item">
+								<a data-bs-toggle="collapse" href="#reports">
+									<i class="fas fa-copy"></i>
+									<p>Reports</p>
+									<span class="caret"></span>
+								</a>
+								<div class="collapse" id="reports">
+									<ul class="nav nav-collapse">
+										<li class="sub-menu cursor-pointer">
+											<a id="cash-d-report-menu" data-parent="reports" data-url="pages/reports/cash-d-report/cash-d-report.php" onclick="loadMenu('views/reports/cash-d-report/cash-d-report.php','cash-d-report')">
+												<span class="sub-item">Cash Donation Report</span>
+											</a>
+										</li>
+
+										<li class="sub-menu cursor-pointer">
+											<a id="inkind-d-report-menu" data-parent="reports" data-url="pages/reports/inkind-d-report/inkind-d-report.php" onclick="loadMenu('views/reports/inkind-d-report/inkind-d-report.php','inkind-d-report')">
+												<span class="sub-item">In-kind Donation Report</span>
+											</a>
+										</li>
+									</ul>
+								</div>
+							</li>
+						<?php } ?>
 					</ul>
 				</div>
 			</div>
@@ -388,27 +425,6 @@ $userInfo = $q->fetch();
 					</div>
 				</div>
 			</form>
-
-			<!-- Inkind D Modal -->
-			<form id="inkind-d-form">
-				<div class="modal fade modal-reset" id="inkind-d-modal" tabindex="-1" role="dialog" aria-hidden="true">
-					<div class="modal-dialog modal-xl" role="document">
-						<div class="modal-content" id="_modal-details">
-							<!-- show modal details here -->
-						</div>
-					</div>
-				</div>
-			</form>
-
-			<!-- External D Modal -->
-			<div class="modal fade modal-reset" id="external-d-modal" tabindex="-1" role="dialog" aria-hidden="true">
-				<div class="modal-dialog modal-xl" role="document">
-					<div class="modal-content" id="_modal-details">
-						<!-- show modal details here -->
-					</div>
-				</div>
-			</div>
-
 			<!-- end -->
 		</div>
 

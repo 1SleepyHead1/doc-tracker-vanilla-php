@@ -20,6 +20,18 @@ try {
     ");
     $getDocTypes->execute();
     $docTypes = $getDocTypes->fetchAll();
+
+    $getDetails = $c->prepare("
+        SELECT 
+            doc.doc_type,
+            user.name AS submitter,
+            doc.purpose 
+        FROM submitted_documents doc
+        LEFT JOIN users user ON doc.user_id = user.id
+        WHERE doc.id=?
+    ");
+    $getDetails->execute([$id]);
+    $details = $getDetails->fetch();
 ?>
 
     <div class="modal-header no-bd">
@@ -40,14 +52,20 @@ try {
                             <option value="<?= $docType['id'] ?>"><?= $docType['doc_type_name'] ?></option>
                         <?php } ?>
                     </select>
+
+                    <?php if ($action == 1) { ?>
+                        <script>
+                            $("#doc-type").val(<?= $details['doc_type'] ?>);
+                        </script>
+                    <?php } ?>
                 </div>
                 <div class="col-md-12">
                     <label for="submitter" class="form-label small">Submitter</label>
-                    <input type="text" class="form-control form-control-md" id="submitter" name="submitter" list="submitter-list" data-list-type="submitter" value="<?= $action == 0 ? "" : $details['person_in_charge'] ?>" onchange="validateDataListOptions('submitter','','submitter-list');" required>
+                    <input type="text" class="form-control form-control-md" id="submitter" name="submitter" list="submitter-list" data-list-type="submitter" value="<?= $action == 0 ? "" : $details['submitter'] ?>" onchange="validateDataListOptions('submitter','','submitter-list');" required>
                 </div>
                 <div class="col-md-12">
                     <label for="purpose" class="form-label small">Purpose</label>
-                    <textarea name="purpose" id="purpose" class="form-control form-control-md" rows="3" required></textarea>
+                    <textarea name="purpose" id="purpose" class="form-control form-control-md" rows="3" required><?= $action == 0 ? "" : $details['purpose'] ?></textarea>
                 </div>
             </div>
             <div class="modal-footer mt-3">
@@ -60,7 +78,7 @@ try {
     <script>
         $("#doc-entry-form").submit(function(e) {
             e.preventDefault();
-            <?= $action == 0 ? "" : "" ?>
+            <?= $action == 0 ? "insertUpdateDocument(0)" : "insertUpdateDocument(1,$id)" ?>
         });
     </script>
 

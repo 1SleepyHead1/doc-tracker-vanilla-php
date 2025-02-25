@@ -376,7 +376,7 @@ const swalAlert = (title = "Success", icon = "success", className = "success", t
 	});
 };
 
-const swalConfirmation = (text, title, confirmText, id = null, callback = null, timer = 3000) => {
+const swalConfirmation = (text, title, confirmText, id = null, callback = null, btnText = "Delete", timer = 3000) => {
 	swal({
 		title: "Notice!",
 		text: text,
@@ -387,7 +387,7 @@ const swalConfirmation = (text, title, confirmText, id = null, callback = null, 
 				className: "btn btn-danger"
 			},
 			confirm: {
-				text: "Delete",
+				text: btnText,
 				className: "btn btn-success"
 			}
 		}
@@ -649,7 +649,7 @@ const convertWholeNumber = (num, ones, tens) => {
 	return words.trim();
 };
 
-function previewPrint(e) {
+const previewPrintQr = (e) => {
 	const content = $(`#${e}`).html();
 	const myWindow = window.open("", "Print", "height=600,width=800");
 
@@ -677,9 +677,43 @@ function previewPrint(e) {
 	};
 
 	return true;
-}
+};
 
-function previewPrintChart(e) {
+const donwloadQrCode = (f) => {
+	window.location.href = `assets/uploads/qr-codes/${f}.png`;
+};
+
+const previewPrint = (e) => {
+	const content = $(`#${e}`).html();
+	const myWindow = window.open("", "Print", "height=600,width=800");
+
+	myWindow.document.write(`
+        <html>
+            <head>
+                <title>Print</title>
+                <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+                <link rel="stylesheet" href="assets/css/plugins.min.css" />
+                <link rel="stylesheet" href="assets/css/style.min.css" />
+                <script src="assets/js/core/bootstrap.min.js"></script>
+            </head>
+            <body class="te d-flex justify-content-center align-items-center" style="-webkit-print-color-adjust:exact; height:100vh;">
+                ${content}
+            </body>
+        </html>
+    `);
+	myWindow.document.close();
+	myWindow.focus();
+
+	myWindow.onload = function () {
+		myWindow.focus();
+		myWindow.print();
+		myWindow.close();
+	};
+
+	return true;
+};
+
+const previewPrintChart = (e) => {
 	// Get the canvas element
 	const canvas = document.getElementById(`${e}`);
 
@@ -724,7 +758,7 @@ function previewPrintChart(e) {
 	}, 3000);
 
 	return true;
-}
+};
 
 const dataTablesNewRow = (table, dataTable, newRow) => {
 	// Get all rows data and add the new row to the beginning

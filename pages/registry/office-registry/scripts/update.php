@@ -18,11 +18,11 @@ try {
 
     $checkOfficeCode = $c->prepare("SELECT id FROM offices WHERE LOWER(office_code) = LOWER(?) AND id<>?");
     $checkOfficeCode->execute([$officeCode, $id]);
-    $officeCodeExists = $checkOfficeCode->fetchColumn(0);
+    $officeCodeExists = $checkOfficeCode->fetchColumn();
 
     $checkOfficeName = $c->prepare("SELECT id FROM offices WHERE LOWER(office_name) = LOWER(?) AND id<>?");
     $checkOfficeName->execute([$officeName, $id]);
-    $officeNameExists = $checkOfficeName->fetchColumn(0);
+    $officeNameExists = $checkOfficeName->fetchColumn();
 
 
     if ($officeCodeExists || $officeNameExists) {
