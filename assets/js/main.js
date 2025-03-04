@@ -12,8 +12,8 @@ $(document).ready(function () {
 	// The last segment of the path is the file name
 	let fileName = pathSegments.pop(); // 'login.php'
 
-	if (fileName !== "login.php") {
-		if (sessionStorage.getItem("menu") == undefined || sessionStorage.getItem("menu") == null) {
+	if (fileName !== "login.php" || fileName !== "docstats.php") {
+		if (sessionStorage.getItem("menu") === undefined || sessionStorage.getItem("menu") === null) {
 			$(`#default-menu`).click();
 		} else {
 			loadDefaultMenu();
@@ -212,8 +212,6 @@ $(document).ready(function () {
 });
 
 // --globals--
-var $uid, $did;
-
 const loader = (elementId, color = "primary") => {
 	elementId.html(`
 		<div class="d-flex justify-content-center align-items-center mt-4">
@@ -455,7 +453,7 @@ const getPageHeader = (menu) => {
 		default:
 			title = "Dashboard";
 			icon = "fas fa-home";
-			subTitle = "Home Panel";
+			subTitle = "Home";
 			parent = "dashboard";
 			break;
 	}
@@ -523,31 +521,8 @@ async function toggleModal(modalId, action = 0) {
 	action == 0 ? await modalElement.modal("show") : await modalElement.modal("hide");
 }
 
-// if action == 0 {show offcanvas} else {hide}
-async function toggleCanvas(canvasId, action = 0) {
-	const canvasElement = $(`#${canvasId}`);
-
-	if (action == 0) {
-		await canvasElement.offcanvas("show");
-	} else {
-		await canvasElement.offcanvas("hide");
-		canvasElement.html("");
-	}
-}
-
-const countNotifs = () => {
-	const btnReadAll = $("#btn-read-notifs");
-	const badgeCount = $("#_notif-count");
-	const count = $(`#_tbl-notifs tbody tr:not([id="tr-no-notifs"])[read="0"]`).length;
-	badgeCount.html(count);
-
-	btnReadAll.prop("hidden", true);
-
-	if (count === 0) {
-		btnReadAll.prop("hidden", true);
-	} else {
-		btnReadAll.prop("hidden", false);
-	}
+const showDocStats = (dn) => {
+	window.open(`docstats.php?dn=${dn}`, "_blank");
 };
 
 //if you want to empty modal every close add 'modal-reset' class to its parent div element
@@ -680,7 +655,12 @@ const previewPrintQr = (e) => {
 };
 
 const donwloadQrCode = (f) => {
-	window.location.href = `assets/uploads/qr-codes/${f}.png`;
+	const link = document.createElement("a");
+	link.href = `assets/uploads/qr-codes/${f}.png`;
+	link.download = `${fileName}.png`;
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
 };
 
 const previewPrint = (e) => {
@@ -859,15 +839,15 @@ const loadDefaultMenu = () => {
 // user edit profile
 const showUserProfileModalContent = async (id) => {
 	try {
-		const container = $(`#user-profile-modal`).find(`div[id="_modal-details"]`);
+		const container = $(`#update-user-profile-modal`).find(`div[id="_modal-content"]`);
 		const response = await $.ajax({
-			url: `views/user-profile/c/modal-details.php`,
+			url: `pages/user-profile/user-profile.php`,
 			type: "POST",
 			data: { id: id }
 		});
 
 		container.html(response);
-		await toggleModal("user-profile-modal");
+		await toggleModal("update-user-profile-modal");
 	} catch (error) {
 		if (error.status == 500) {
 			console.error("Internal Server Error (500) occurred.");
@@ -886,15 +866,10 @@ const showUserProfileModalContent = async (id) => {
 };
 
 const updateProfile = (id) => {
-	if (checkForEmptyInputs("user-profile-i")) {
-		return;
-	}
-
-	const formElement = $("#user-profile-form");
-	// const uname = formElement.find(`input[name="usern"]`).val();
-	const cword = formElement.find(`input[name="c-pword"]`).val();
-	const pword = formElement.find(`input[name="n-pword"]`).val();
-	const confirmPword = formElement.find(`input[name="confirm-pword"]`).val();
+	const formElement = $("#update-user-profile-form");
+	const cword = formElement.find(`input[name="current-password"]`).val();
+	const pword = formElement.find(`input[name="new-password"]`).val();
+	const confirmPword = formElement.find(`input[name="confirm-password"]`).val();
 	const pwrodLenthg = pword.length;
 	const confirmPwordLenthg = confirmPword.length;
 
@@ -938,197 +913,47 @@ const updateProfile = (id) => {
 		console.error(errorMessages[jqXHR.status] || `Unexpected Error: ${textStatus}, ${errorThrown}`);
 	});
 };
-// end
+// end edit profile
 
-// globals2
-const showInkindDtems = async (id) => {
-	try {
-		const container = $(`#inkind-d-modal`).find(`div[id="_modal-details"]`);
-		const response = await $.ajax({
-			url: `views/donation/inkind-d/c/d-items.php`,
-			type: "POST",
-			data: { id: id }
-		});
+// notifs
+const countNotifs = () => {
+	const notificationItems = $("#_notifications").find(".notification-item").length;
+	const btnReadAllNotifs = $("#btn-read-notifs");
+	const noNotif = $("#no-notifications");
+	const notifCount = $("#_notif-count");
 
-		container.html(response);
-		await toggleModal("inkind-d-modal");
-	} catch (error) {
-		if (error.status == 500) {
-			console.error("Internal Server Error (500) occurred.");
-		} else if (error.status == 404) {
-			console.error("Resource not found (404) error.");
-		} else if (error.status == 403) {
-			console.error("Forbidden (403) error.");
-		} else if (error.status == 401) {
-			console.error("Unauthorized (401) error.");
-		} else if (error.status == 400) {
-			console.error("Bad Request (400) error.");
-		} else {
-			console.error("Unexpected Error:", error);
-		}
-	}
-};
-
-const showExternalDItems = async (id) => {
-	try {
-		const container = $(`#external-d-modal`).find(`div[id="_modal-details"]`);
-		const response = await $.ajax({
-			url: `views/donation/external-d/c/d-items.php`,
-			type: "POST",
-			data: { id: id }
-		});
-
-		container.html(response);
-		await toggleModal("external-d-modal");
-	} catch (error) {
-		if (error.status == 500) {
-			console.error("Internal Server Error (500) occurred.");
-		} else if (error.status == 404) {
-			console.error("Resource not found (404) error.");
-		} else if (error.status == 403) {
-			console.error("Forbidden (403) error.");
-		} else if (error.status == 401) {
-			console.error("Unauthorized (401) error.");
-		} else if (error.status == 400) {
-			console.error("Bad Request (400) error.");
-		} else {
-			console.error("Unexpected Error:", error);
-		}
-	}
-};
-// end
-
-// user notifs
-
-const getUserNotifs = async () => {
-	const notifsTable = $("#_tbl-notifs");
-	const trNotifs = $('#_tbl-notifs tbody tr:not([id="tr-no-notifs"])')
-		.map(function () {
-			return $(this).attr("data-id");
-		})
-		.get();
-
-	try {
-		const response = await $.ajax({
-			url: `script/notifs/user/get-user-notifs.php`,
-			type: "POST",
-			data: { id: $did }
-		});
-
-		const json = JSON.parse(response);
-		const notifs = json.data.map((obj) => obj.id);
-		const missingNotif = trNotifs.filter((value) => !notifs.includes(value));
-		missingNotif.map((value) => $(`#tr-notif-${value}`).remove());
-
-		if (json.data.length == 0) {
-			if (!$("#tr-no-notifs").length) {
-				await notifsTable.find("tbody").prepend(`
-					<tr id="tr-no-notifs" class="no-hover border-bottom px-3" onclick="">
-						<td class="text-center">
-							<i class="fas fa-bell-slash text-danger" style="font-size: 1.5rem;"></i>
-						</td>
-						<td colspan="">
-							<small class="notif-text text-muted">Nothing to see here.</small>
-						</td>
-					</tr>
-				`);
-			}
-		} else {
-			if ($("#tr-no-notifs").length) {
-				await $("#tr-no-notifs").remove();
-			}
-
-			await $.each(json.data, function (key, row) {
-				if (!$(`#tr-notif-${row.id}`).length) {
-					let a;
-
-					if (row.type === "donation") {
-						a = `
-							<tr id="tr-notif-${row.id}" class="border-bottom px-3" data-id="${row.id}" type="${row.type}" read="${row.is_read}" onclick="${row.is_read == 0 ? "readUserNotif('0', this)" : ""}" style="cursor: pointer;">
-								<td class="text-center">
-									<i class="fas fa-bell text-primary" style="font-size: 1.5rem;"></i>
-								</td>
-								<td>
-									<small name="time" class="${row.is_read == 0 ? "text-primary" : "text-muted"} notif-text fw-bolder">${formatDateTime(row.tstamp)}</small>
-									<p class="notif-text fw-thin my-2"><b>${row.quantity} ${row.unit_name}</b> of <b>${row.item}</b> has been donated to <b>${row.grantee}</b></p>
-									<p class="notif-text mb-1 fw-thin">Reference Number: <b>${row.reference_no}</b></p>
-								</td>
-							</tr>
-						`;
-					} else {
-						a = `
-							<tr id="tr-notif-${row.id}" class="border-bottom px-3" data-id="${row.id}" type="${row.type}" read="${row.is_read}" onclick="${row.is_read == 0 ? "readUserNotif('0', this)" : ""}" style="cursor: pointer;">
-								<td class="text-center">
-									<i class="fas fa-bell text-danger" style="font-size: 1.5rem;"></i>
-								</td>
-								<td>
-									<small name="time" class="${row.is_read == 0 ? "text-danger" : "text-muted"} notif-text fw-bolder">${formatDateTime(row.tstamp)}</small>
-									<p class="notif-text fw-thin my-2"><b>${row.quantity} ${row.unit_name}</b> of <b>${row.item}</b> has expired.</p>
-									<p class="notif-text mb-1 fw-thin">Reference Number: <b>${row.reference_no}</b></p>
-								</td>
-							</tr>
-						`;
-					}
-
-					notifsTable.find("tbody").prepend(a);
-				}
-			});
-		}
-
-		countNotifs();
-	} catch (error) {
-		if (error.status == 500) {
-			console.error("Internal Server Error (500) occurred.");
-		} else if (error.status == 404) {
-			console.error("Resource not found (404) error.");
-		} else if (error.status == 403) {
-			console.error("Forbidden (403) error.");
-		} else if (error.status == 401) {
-			console.error("Unauthorized (401) error.");
-		} else if (error.status == 400) {
-			console.error("Bad Request (400) error.");
-		} else {
-			console.error("Unexpected Error:", error);
-		}
-	}
-};
-
-const updateUserNotif = (action, e = null) => {
-	if (action == 0) {
-		const type = e.attr("type");
-		const timeElement = e.find(`small[name="time"]`);
-		const color = type === "donation" ? "text-primary" : "text-danger";
-
-		timeElement.removeClass(color).addClass("text-muted");
-		e.attr("read", 1);
-		e.attr("onclick", "");
+	if (notificationItems > 0) {
+		notifCount.text(notificationItems).prop("hidden", false);
+		btnReadAllNotifs.prop("hidden", false);
+		noNotif.prop("hidden", true);
 	} else {
-		const tr = $(`#_tbl-notifs tbody tr:not([id="tr-no-notifs"])[read="0"]`);
-
-		tr.each(function () {
-			const type = $(this).attr("type");
-			const timeElement = $(this).find(`small[name="time"]`);
-			const color = type === "donation" ? "text-primary" : "text-danger";
-
-			timeElement.removeClass(color).addClass("text-muted");
-			$(this).attr("read", 1);
-			$(this).attr("onclick", "");
-		});
+		notifCount.prop("hidden", true);
+		btnReadAllNotifs.prop("hidden", true);
+		noNotif.prop("hidden", false);
 	}
 
-	countNotifs();
+	if ($(".dropdown-footer a").text().trim() === "See All Notifications") {
+		$(".notification-item").hide();
+		$(".notification-item:lt(10)").show();
+	}
 };
 
-const readUserNotif = (action, e = null) => {
+const readNotif = (a, e = null) => {
 	const element = $(e);
-	const id = element.attr("data-id");
-	const type = element.attr("type");
+	const id = element.data("id");
 
-	$.post(`script/notifs/user/read-notif.php`, { action: action, id: id, type: type }, function (data) {
-		if (data === "s") {
-			updateUserNotif(action, element);
+	$.post(`script/notifs/scripts/read.php`, { action: a, id: id || null }, function (data) {
+		const response = JSON.parse(data);
+		if (response.status) {
+			if (a === 0) {
+				$(`.notification-item[data-id="${id}"]`).remove();
+			} else {
+				$(`.notification-item`).remove();
+			}
+
+			countNotifs();
 		} else {
-			showAlert(data, "danger");
+			showAlert(response.message, "danger");
 		}
 	}).fail(function (jqXHR, textStatus, errorThrown) {
 		const errorMessages = {
@@ -1142,154 +967,80 @@ const readUserNotif = (action, e = null) => {
 	});
 };
 
-// end
+const adminNotifs = async () => {
+	const parentElement = $("#_notifications");
+	const notifs = parentElement.find(".notification-item");
+	let existings = [];
 
-// admin notifs
+	notifs.each(function () {
+		existings.push($(this).data("id"));
+	});
 
-const getAdminNotifs = async () => {
-	const notifsTable = $("#_tbl-notifs");
-	const trNotifs = $('#_tbl-notifs tbody tr:not([id="tr-no-notifs"])')
-		.map(function () {
-			return $(this).attr("data-id");
-		})
-		.get();
+	await $.post(`script/notifs/admin-notifs.php`, { existings: JSON.stringify(existings) }, function (data) {
+		const response = JSON.parse(data);
+		if (response.status) {
+			const notifs = response.data;
 
-	function trToAppend(d) {
-		let e;
-		if (calcDaysRemaining(d.expiry_date) === 0) {
-			e = `
-				<tr id="tr-notif-${d.id}" class="border-bottom px-3" data-id="${d.id}" type="expired" read="${d.is_read}" onclick="${d.is_read == 0 ? "readAdminNotif('0', this)" : ""}" style="cursor: pointer;">
-					<td class="text-center">
-						<i class="fas fa-bell text-danger" style="font-size: 1.5rem;"></i>
-					</td>
-					<td>
-						<small name="time" class="${d.is_read == 0 ? "text-danger" : "text-muted"} notif-text fw-bolder">${formatDateTime(d.tstamp)}</small>
-						<p class="notif-text fw-thin my-2"><b>${d.quantity} ${d.unit_name}</b> of <b>${d.item}</b> from <b>${d.donor === "  " ? "Anonymous" : d.donor}</b> has expired.</p>
-						<p class="notif-text mb-1 fw-thin">Reference Number: <b>${d.reference_no}</b></p>
-					</td>
-				</tr>
-			`;
-		} else if (calcDaysRemaining(d.expiry_date) === 1) {
-			e = `
-				<tr id="tr-notif-${d.id}" class="border-bottom px-3" data-id="${d.id}" type="soon-to-expire" read="${d.is_read}" onclick="${d.is_read == 0 ? "readAdminNotif('0', this)" : ""}" style="cursor: pointer;">
-					<td class="text-center">
-						<i class="fas fa-bell text-primary" style="font-size: 1.5rem;"></i>
-					</td>
-					<td>
-						<small name="time" class="${d.is_read == 0 ? "text-primary" : "text-muted"} notif-text fw-bolder">${formatDateTime(d.tstamp)}</small>
-						<p class="notif-text fw-thin my-2"><b>${d.quantity} ${d.unit_name}</b> of <b>${d.item}</b> from <b>${d.donor === "  " ? "Anonymous" : d.donor}</b> will expire within <b>${calcDaysRemaining(d.expiry_date)}</b> day.</p>
-						<p class="notif-text mb-1 fw-thin">Reference Number: <b>${d.reference_no}</b></p>
-					</td>
-				</tr>
-			`;
-		} else {
-			e = `
-				<tr id="tr-notif-${d.id}" class="border-bottom px-3" data-id="${d.id}" type="soon-to-expire" read="${d.is_read}" onclick="${d.is_read == 0 ? "readAdminNotif('0', this)" : ""}" style="cursor: pointer;">
-					<td class="text-center">
-						<i class="fas fa-bell text-primary" style="font-size: 1.5rem;"></i>
-					</td>
-					<td>
-						<small name="time" class="${d.is_read == 0 ? "text-primary" : "text-muted"} notif-text fw-bolder">${formatDateTime(d.tstamp)}</small>
-						<p class="notif-text fw-thin my-2"><b>${d.quantity} ${d.unit_name}</b> of <b>${d.item}</b> from <b>${d.donor === "  " ? "Anonymous" : d.donor}</b> will expire within <b>${calcDaysRemaining(d.expiry_date)}</b> days.</p>
-						<p class="notif-text mb-1 fw-thin">Reference Number: <b>${d.reference_no}</b></p>
-					</td>
-				</tr>
-			`;
-		}
+			if (notifs) {
+				$.each(notifs, function (key, notif) {
+					const notificationTemplates = {
+						Forwarded: {
+							icon: "fa-paper-plane",
+							color: "text-info",
+							title: "Document Forwarded",
+							message: "has been forwarded to the next office"
+						},
+						"For Release": {
+							icon: "fa-check-circle",
+							color: "text-success",
+							title: "Document is Ready for Releasing",
+							message: "is now ready for releasing"
+						},
+						Rejected: {
+							icon: "fa-exclamation-circle",
+							color: "text-danger",
+							title: "Document has been Rejected",
+							message: "has been rejected"
+						},
+						default: {
+							icon: "fa-file-alt",
+							color: "text-primary",
+							title: "New Document Submitted",
+							message: "has been submitted"
+						}
+					};
 
-		return e;
-	}
+					const template = notificationTemplates[notif.status] || notificationTemplates.default;
 
-	try {
-		const response = await $.ajax({
-			url: `script/notifs/admin/get-admin-notifs.php`,
-			type: "POST",
-			data: { id: $did }
-		});
+					const notifElement = `
+						<div class="notification-item p-3 border-bottom" data-id="${notif.id}">
+							<div class="d-flex">
+								<div class="icon me-3">
+									<i class="fas ${template.icon} fa-lg ${template.color}"></i>
+								</div>
+								<div class="content flex-grow-1">
+									<h6 class="mb-1">${template.title}</h6>
+									<p class="text-muted small mb-2">Document <b>${notif.doc_no}</b> ${template.message}.</p>
+									<span class="text-muted smaller">${formatDateTime(notif.tstamp)}</span>
+									<br>
+									<button class="btn btn-link text-primary p-0 fw-semibold" style="font-size: 13px" onclick="showDocStats('${notif.doc_no}')">
+										View Document
+									</button>
+								</div>
+								<div class="actions">
+									<button class="btn btn-link text-muted p-0" data-id="${notif.id}" onclick="readNotif(0,this)">
+										<i class="fas fa-times"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+					`;
 
-		const json = JSON.parse(response);
-		const notifs = json.data.map((obj) => obj.id);
-		const missingNotif = trNotifs.filter((value) => !notifs.includes(value));
-		missingNotif.map((value) => $(`#tr-notif-${value}`).remove());
-
-		if (json.data.length == 0) {
-			if (!$("#tr-no-notifs").length) {
-				await notifsTable.find("tbody").prepend(`
-					<tr id="tr-no-notifs" class="no-hover border-bottom px-3" onclick="">
-						<td class="text-center">
-							<i class="fas fa-bell-slash text-danger" style="font-size: 1.5rem;"></i>
-						</td>
-						<td colspan="">
-							<small class="notif-text text-muted">Nothing to see here.</small>
-						</td>
-					</tr>
-				`);
-			}
-		} else {
-			if ($("#tr-no-notifs").length) {
-				await $("#tr-no-notifs").remove();
+					parentElement.prepend(notifElement);
+				});
 			}
 
-			await $.each(json.data, function (key, row) {
-				if (!$(`#tr-notif-${row.id}`).length) {
-					notifsTable.find("tbody").prepend(trToAppend(row));
-				}
-			});
-		}
-
-		countNotifs();
-	} catch (error) {
-		if (error.status == 500) {
-			console.error("Internal Server Error (500) occurred.");
-		} else if (error.status == 404) {
-			console.error("Resource not found (404) error.");
-		} else if (error.status == 403) {
-			console.error("Forbidden (403) error.");
-		} else if (error.status == 401) {
-			console.error("Unauthorized (401) error.");
-		} else if (error.status == 400) {
-			console.error("Bad Request (400) error.");
-		} else {
-			console.error("Unexpected Error:", error);
-		}
-	}
-};
-
-const updateAdminNotif = (action, e = null) => {
-	if (action == 0) {
-		const type = e.attr("type");
-		const timeElement = e.find(`small[name="time"]`);
-		const color = type === "soon-to-expire" ? "text-primary" : "text-danger";
-
-		timeElement.removeClass(color).addClass("text-muted");
-		e.attr("read", 1);
-		e.attr("onclick", "");
-	} else {
-		const tr = $(`#_tbl-notifs tbody tr:not([id="tr-no-notifs"])[read="0"]`);
-
-		tr.each(function () {
-			const type = $(this).attr("type");
-			const timeElement = $(this).find(`small[name="time"]`);
-			const color = type === "soon-to-expire" ? "text-primary" : "text-danger";
-
-			timeElement.removeClass(color).addClass("text-muted");
-			$(this).attr("read", 1);
-			$(this).attr("onclick", "");
-		});
-	}
-
-	countNotifs();
-};
-
-const readAdminNotif = (action, e = null) => {
-	const element = $(e);
-	const id = element.attr("data-id");
-
-	$.post(`script/notifs/admin/read-notif.php`, { action: action, id: id }, function (data) {
-		if (data === "s") {
-			updateAdminNotif(action, element);
-		} else {
-			showAlert(data, "danger");
+			countNotifs();
 		}
 	}).fail(function (jqXHR, textStatus, errorThrown) {
 		const errorMessages = {
@@ -1303,7 +1054,140 @@ const readAdminNotif = (action, e = null) => {
 	});
 };
 
-// end
+const officeNotifs = async () => {
+	const parentElement = $("#_notifications");
+
+	await $.post(`script/notifs/office-notifs.php`, { officeId: $("#_container").attr("of") }, function (data) {
+		const response = JSON.parse(data);
+		if (response.status) {
+			const notifs = response.data;
+
+			if (notifs) {
+				parentElement.html("");
+				$.each(notifs, function (key, notif) {
+					const notifElement = `
+						<div class="notification-item p-3 border-bottom" data-id="${notif.id}">
+							<div class="d-flex">
+								<div class="icon me-3">
+									<i class="fas fa-exclamation-circle fa-lg text-info"></i>
+								</div>
+								<div class="content flex-grow-1">
+									<h6 class="mb-1">Document in need of Action</h6>
+									<p class="text-muted small mb-2">Document <b>${notif.doc_no}</b> is in need of action from this office.</p>
+									<span class="text-muted smaller">${formatDateTime(notif.tstamp)}</span>
+									<br>
+									<button class="btn btn-link text-primary p-0 fw-semibold" style="font-size: 13px" onclick="showDocStats('${notif.doc_no}')">
+										View Document
+									</button>
+								</div>
+							</div>
+						</div>
+					`;
+					parentElement.prepend(notifElement);
+				});
+			}
+
+			countNotifs();
+		}
+	}).fail(function (jqXHR, textStatus, errorThrown) {
+		const errorMessages = {
+			500: "Internal Server Error (500) occurred.",
+			404: "Resource not found (404) error.",
+			403: "Forbidden (403) error.",
+			401: "Unauthorized (401) error.",
+			400: "Bad Request (400) error."
+		};
+		console.error(errorMessages[jqXHR.status] || `Unexpected Error: ${textStatus}, ${errorThrown}`);
+	});
+};
+
+const submitterNotifs = async () => {
+	const parentElement = $("#_notifications");
+	const notifs = parentElement.find(".notification-item");
+	let existings = [];
+
+	notifs.each(function () {
+		existings.push($(this).data("id"));
+	});
+
+	await $.post(`script/notifs/submitter-notifs.php`, { u: $("#_container").attr("u"), existings: JSON.stringify(existings) }, function (data) {
+		const response = JSON.parse(data);
+		if (response.status) {
+			const notifs = response.data;
+
+			if (notifs) {
+				$.each(notifs, function (key, notif) {
+					const notificationTemplates = {
+						Forwarded: {
+							icon: "fa-paper-plane",
+							color: "text-info",
+							title: "Document Forwarded",
+							message: "has been forwarded to the next office"
+						},
+						"For Release": {
+							icon: "fa-check-circle",
+							color: "text-success",
+							title: "Document is Ready for Releasing",
+							message: "is now ready for releasing"
+						},
+						Rejected: {
+							icon: "fa-exclamation-circle",
+							color: "text-danger",
+							title: "Document has been Rejected",
+							message: "has been rejected"
+						},
+						default: {
+							icon: "fa-file-alt",
+							color: "text-primary",
+							title: "New Document Submitted",
+							message: "has been submitted"
+						}
+					};
+
+					const template = notificationTemplates[notif.status] || notificationTemplates.default;
+
+					const notifElement = `
+						<div class="notification-item p-3 border-bottom" data-id="${notif.id}">
+							<div class="d-flex">
+								<div class="icon me-3">
+									<i class="fas ${template.icon} fa-lg ${template.color}"></i>
+								</div>
+								<div class="content flex-grow-1">
+									<h6 class="mb-1">${template.title}</h6>
+									<p class="text-muted small mb-2">Document <b>${notif.doc_no}</b> ${template.message}.</p>
+									<span class="text-muted smaller">${formatDateTime(notif.tstamp)}</span>
+									<br>
+									<button class="btn btn-link text-primary p-0 fw-semibold" style="font-size: 13px" onclick="showDocStats('${notif.doc_no}')">
+										View Document
+									</button>
+								</div>
+								<div class="actions">
+									<button class="btn btn-link text-muted p-0" data-id="${notif.id}" onclick="readNotif(0,this)">
+										<i class="fas fa-times"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+					`;
+
+					parentElement.prepend(notifElement);
+				});
+			}
+
+			countNotifs();
+		}
+	}).fail(function (jqXHR, textStatus, errorThrown) {
+		const errorMessages = {
+			500: "Internal Server Error (500) occurred.",
+			404: "Resource not found (404) error.",
+			403: "Forbidden (403) error.",
+			401: "Unauthorized (401) error.",
+			400: "Bad Request (400) error."
+		};
+		console.error(errorMessages[jqXHR.status] || `Unexpected Error: ${textStatus}, ${errorThrown}`);
+	});
+};
+// end notifs
 
 const dbBackup = () => {
 	$.post(`script/a/db-backup/create-file.php`, {}, function (data) {
@@ -1326,76 +1210,3 @@ const dbBackup = () => {
 		console.error(errorMessages[jqXHR.status] || `Unexpected Error: ${textStatus}, ${errorThrown}`);
 	});
 };
-
-// for chatbot
-// Chat Widget Functionality
-$("#chatToggleBtn").on("click", function () {
-	$("#chatBox").toggle();
-});
-
-$("#chatCloseBtn").on("click", function () {
-	$("#chatBox").hide();
-});
-
-$("#sendMessage").on("click", sendChatMessage);
-
-$("#chatInput").on("keypress", function (e) {
-	if (e.which == 13) {
-		// Enter key
-		sendChatMessage();
-	}
-});
-
-function sendChatMessage() {
-	const message = $("#chatInput").val().trim();
-	if (message) {
-		// Add user message
-		const userMessage = `
-			<div class="chat-message user">
-				<div class="message-content">
-					${message}
-				</div>
-			</div>
-		`;
-
-		$("#chatBody").append(userMessage);
-		// Clear input
-		$("#chatInput").val("");
-		// Scroll to bottom
-		$("#chatBody").scrollTop($("#chatBody")[0].scrollHeight);
-
-		// Simulate bot response (you can replace this with actual API call)
-		setTimeout(() => {
-			$.post(`script/chatbot/a/a.php`, { message: message }, function (data) {
-				if (data === "s") {
-					const botMessage = `
-						<div class="chat-message bot">
-							<div class="message-content">
-								This is a demo response. Replace with actual chatbot logic.
-							</div>
-						</div>
-					`;
-					$("#chatBody").append(botMessage);
-					$("#chatBody").scrollTop($("#chatBody")[0].scrollHeight);
-				} else {
-					showAlert(data, "danger");
-				}
-			}).fail(function (jqXHR, textStatus, errorThrown) {
-				if (jqXHR.status == 500) {
-					console.error("Internal Server Error (500) occurred.");
-				} else if (jqXHR.status == 404) {
-					console.error("Resource not found (404) error.");
-				} else if (jqXHR.status == 403) {
-					console.error("Forbidden (403) error.");
-				} else if (jqXHR.status == 401) {
-					console.error("Unauthorized (401) error.");
-				} else if (jqXHR.status == 400) {
-					console.error("Bad Request (400) error.");
-				} else {
-					console.error("Unexpected Error: " + textStatus, errorThrown);
-				}
-			});
-		}, 1000);
-	}
-}
-// end for chatbot

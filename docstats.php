@@ -37,7 +37,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET' || !isset($_GET['dn'])) {
 ?>
 
 <?php
-
 session_start();
 require_once "conn.php";
 require_once "script/globals.php";
@@ -53,15 +52,21 @@ try {
             doc.purpose, 
             doc.status,
             user.name AS submitter,
+            user.email,
+            user.contact_no,
+            MAX(setting.step) AS max_step,
             doc.tstamp
         FROM submitted_documents doc
         LEFT JOIN document_types doc_type ON doc.doc_type = doc_type.id
         LEFT JOIN users user ON doc.user_id = user.id
+        LEFT JOIN document_transaction_setting setting ON doc.doc_type = setting.doc_type
         WHERE doc.doc_number = ?
         ORDER BY doc.tstamp DESC;
    ");
     $getDocument->execute([$docNo]);
     $document  = $getDocument->fetch();
+
+    $maxStep = $document['max_step'];
 ?>
 
     <!DOCTYPE html>
@@ -141,10 +146,24 @@ try {
                 ?>
 
                     <div id="header" class="mb-4" style="display: none;">
-                        <a id="btn-login" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#office-personnel-login-modal"><i class="fas fa-user-tie me-2"></i>Log in as Office Personnel</a>
+                        <?php if (!isset($_SESSION['is_office_personnel'])) { ?>
+                            <?php if ($currentStep <= $maxStep) { ?>
+                                <?php if ($document['status'] != "Rejected" || $document['status'] != "For Release") { ?>
+                                    <a id="btn-login" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#office-personnel-login-modal"><i class="fas fa-user-tie me-2"></i>Log in as Office Personnel</a>
+                                <?php } ?>
+                            <?php } ?>
+                        <?php } else { ?>
+                            <?php if ($currentStep <= $maxStep) { ?>
+                                <?php if ($document['status'] != "Rejected" || $document['status'] != "For Release") { ?>
+                                    <!-- <button id="btn-logout" class="btn btn-primary mr-4 mb-2" onclick="voidUser()"><i class="fas fa-sign-out-alt me-2"></i>Logout</button> -->
+                                    <button class="btn btn-success mb-2 btn-actions" id="btn-proceed" onclick="confirmAction(0)"><i class="fas fa-check me-2"></i>Approve</button>
+                                    <button class="btn btn-danger mb-2 btn-actions" id="btn-reject" onclick="confirmAction(1)"><i class="fas fa-times me-2"></i>Reject</button>
+                                <?php } ?>
+                            <?php } ?>
+                        <?php } ?>
                     </div>
 
-                    <div id="content" doc-no="<?= $docNo ?>" doc-type="<?= $document['doc_type_id'] ?>" current-step="<?= $currentStep ?>" u="" style="display: none;">
+                    <div id="content" doc-no="<?= $docNo ?>" doc-type="<?= $document['doc_type_id'] ?>" current-step="<?= $currentStep ?>" max-step="<?= $maxStep ?>" u="<?= isset($_SESSION['user_id']) ? $_SESSION['user_id'] : "" ?>" style="display: none;">
                         <div class="row justify-content-center">
                             <!-- Document Details Column -->
                             <div class="col-md-4 position-sticky">
@@ -163,6 +182,14 @@ try {
                                         <div class="mb-3">
                                             <label class="form-label fw-bold"><i class="fas fa-user me-2"></i>Submitter</label>
                                             <p class="mb-1"><?= $document['submitter'] ?></p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold"><i class="fas fa-phone me-2"></i>Contact Number</label>
+                                            <p class="mb-1"><?= $document['contact_no'] ?></p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold"><i class="fas fa-envelope me-2"></i>Email</label>
+                                            <p class="mb-1"><?= $document['email'] ?></p>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label fw-bold"><i class="fas fa-flag me-2"></i>Status</label>
@@ -192,7 +219,7 @@ try {
                                                             <div class="timeline-heading">
                                                                 <h4 class="timeline-title">Document submitted</h4>
                                                                 <p>
-                                                                    <small class="">
+                                                                    <small class="text-muted">
                                                                         <i class="far fa-calendar-check me-1"></i>
                                                                         <span class="text-primary fw-medium"><?= date("M. d, Y h:i A", strtotime($document['tstamp'])) ?></span>
                                                                     </small>
@@ -207,9 +234,29 @@ try {
                                                     <?php foreach ($settings as $index => $setting) {
                                                         $getLogs->execute([$docNo, $setting['step']]);
                                                         $log = $getLogs->fetch();
+                                                        $stepColor = "";
+
+                                                        if ($log) {
+                                                            if ($log['status'] == "Rejected") {
+                                                                $stepColor = "danger";
+                                                            } else {
+                                                                if ($currentStep == $setting['step']) {
+                                                                    $stepColor = "warning";
+                                                                } else {
+                                                                    $stepColor = "success";
+                                                                }
+                                                            }
+                                                        } else {
+                                                            if ($document['status'] != "Rejected") {
+                                                                if ($currentStep == $setting['step']) {
+                                                                    $stepColor = "warning";
+                                                                }
+                                                            }
+                                                        }
+
                                                     ?>
                                                         <li id="main-step-<?= $setting['step'] ?>" class="<?= $index % 2 == 0 ? "timeline-inverted" : ""  ?>">
-                                                            <div name="step-display" class="timeline-badge<?= $currentStep == $setting['step']  ? " warning" : "" ?><?= $log ? " success" : "" ?>">
+                                                            <div name="step-display" class="timeline-badge <?= $stepColor ?>">
                                                                 <?= $setting['step'] ?>
                                                             </div>
                                                             <div class="timeline-panel">
@@ -227,7 +274,7 @@ try {
                                                                 <div class="timeline-body">
                                                                     <p>
                                                                         <?php if ($log) { ?>
-                                                                            <span name="status-display" class="badge bg-info">
+                                                                            <span name="status-display" class="badge bg-<?= ($log['status'] == "Forwarded") ? "info" : (($log['status'] == "For Release") ? "success" : "danger") ?>">
                                                                                 <?= $log['status'] ?>
                                                                             </span>
                                                                         <?php } else { ?>
@@ -421,7 +468,7 @@ try {
                     function confirmAction(a) {
                         swal({
                             title: "Notice!",
-                            text: "Approve document?",
+                            text: a === 0 ? "Approve document?" : "Reject Document?",
                             icon: "warning",
                             buttons: {
                                 cancel: {
@@ -436,17 +483,18 @@ try {
                         }).then((confirmed) => {
                             if (confirmed) {
                                 const btn = $("#btn-confirm");
-                                a === 0 ? btn.attr("onclick", "approveDoc()") : btn.attr("onclick", "rejectDoc()");
+                                a === 0 ? btn.attr("onclick", "proceedDoc(0)") : btn.attr("onclick", "proceedDoc(1)");
                                 toggleModal("remarks-modal");
                             }
                         });
                     }
 
-                    function approveDoc() {
+                    function proceedDoc(a) {
+                        const api = a === 0 ? "approve.php" : "reject.php";
                         const currentStep = $("#content").attr("current-step");
 
                         $.post(
-                            `script/docstats/approve.php`, {
+                            `script/docstats/${api}`, {
                                 u: $("#content").attr("u"),
                                 docNo: $("#content").attr("doc-no"),
                                 docType: $("#content").attr("doc-type"),
@@ -460,15 +508,18 @@ try {
                                     const currentElement = $(`#main-step-${currentStep}`);
                                     const nextElement = $(`#main-step-${nextStep}`);
 
-                                    currentElement.attr("current-step", nextStep);
+                                    $("#content").attr("current-step", nextStep);
                                     currentElement.find(`div[name="step-display"]`).removeClass("warning").addClass("success");
                                     currentElement.find(`i[name="calendar-display"]`).removeClass("fa-calendar-minus").addClass("fa-calendar-check");
                                     currentElement.find(`span[name="tstamp-display"]`).html(formatDateTime(response.tstamp));
-                                    currentElement.find(`span[name="status-display"]`).addClass("badge bg-info").html(response.status);
+                                    currentElement.find(`span[name="status-display"]`).addClass(`badge bg-${response.status === "Forwarded" ?  "info" : response.status === "For Release" ? "success" : "danger"}`).html(response.status);
                                     currentElement.find(`span[name="remarks-display"]`).html(response.remarks);
 
                                     nextElement.find(`div[name="step-display"]`).addClass("warning");
 
+                                    if (response.status === "Rejected" || response.status === "For Release") {
+                                        $("#header").html("")
+                                    }
                                     showAlert("Document has been approved.");
                                     toggleModal("remarks-modal", 1);
                                 } else {

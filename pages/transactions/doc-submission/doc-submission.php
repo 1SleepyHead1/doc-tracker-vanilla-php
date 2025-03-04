@@ -69,7 +69,7 @@ try {
                                         <td><?= $doc['status'] ?></td>
                                         <td><?= date("M. d, Y h:i A", strtotime($doc['tstamp'])) ?></td>
                                         <td>
-                                            <div class="btn-group">
+                                            <div class="btn-group cursor-pointer">
                                                 <button class="btn btn-icon btn-clean me-0" type="button" id="dropdown-menu-button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                     <i class="fas fa-ellipsis-v"></i>
                                                 </button>
@@ -88,47 +88,6 @@ try {
                     </div>
                 </div>
             </div>
-            <!-- <div class="col-md-5">
-                <div class="card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-list-ul"></i> Setting</h3>
-                    </div>
-                    <div class="card-body" id="_doc-map">
-                    </div>
-                </div>
-
-                <style>
-                    .timeline {
-                        padding: 10px;
-                        margin: 0;
-                    }
-
-                    .timeline-panel {
-                        padding: 15px;
-                        margin-bottom: 20px;
-                        background: #f9f9f9;
-                        border-radius: 5px;
-                        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-                    }
-
-                    .timeline-badge {
-                        width: 50px;
-                        height: 50px;
-                        line-height: 50px;
-                        text-align: center;
-                        border-radius: 50%;
-                        background-color: #007bff;
-                        color: white;
-                        font-weight: bold;
-                        margin-top: 10px;
-                    }
-
-                    .expanded-timeline .timeline-panel {
-                        width: 90%;
-                        margin: 0 auto;
-                    }
-                </style>
-            </div> -->
         </div>
     </div>
 
@@ -151,9 +110,6 @@ try {
     </div>
 
     <script src="pages/transactions/doc-submission/js/doc-submission.js"></script>
-    <script>
-        $(document).ready(function() {});
-    </script>
 <?php
     sleep(1);
 } catch (\Throwable $e) {

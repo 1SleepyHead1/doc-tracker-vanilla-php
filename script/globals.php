@@ -115,3 +115,24 @@ function saveDocTransactionLogs($c, $docNo, $step = 0, $status = "New", $office 
     ");
     $query->execute([$docNo, $step, $status, $office, $updatedBy, $remarks]);
 }
+
+function getLogsStamp($timestamp)
+{
+    $currentTime = time();
+    $givenTime = strtotime($timestamp);
+    $difference = $currentTime - $givenTime;
+
+    $years = floor($difference / (60 * 60 * 24 * 365));
+    $weeks = floor($difference / (60 * 60 * 24 * 7));
+    $days = floor($difference / (60 * 60 * 24));
+
+    if ($years > 0) {
+        return $years . " year" . ($years > 1 ? "s" : "") . " ago";
+    } else if ($weeks > 0) {
+        return $weeks . " week" . ($weeks > 1 ? "s" : "") . " ago";
+    } else if ($days > 0) {
+        return $days . " day" . ($days > 1 ? "s" : "") . " ago";
+    } else {
+        return "Less than a day ago";
+    }
+}

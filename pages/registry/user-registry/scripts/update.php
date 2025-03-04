@@ -79,7 +79,7 @@ try {
         $c->commit();
         $response['data'] = [
             'id' => $id,
-            'userType' => $userTypes[$userType],
+            'userType' => $userCategory === "office" ? null : $userTypes[$userType],
             'userCategory' => $userCategory,
             'name' => $name,
             'email' => $email,

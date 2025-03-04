@@ -7,6 +7,8 @@ require_once "../../conn.php";
 require_once "../globals.php";
 
 try {
+    $c->beginTransaction();
+
     $response = ['status' => true, 'message' => ''];
     $user = sanitize($_POST['u']);
     $docNo = sanitize($_POST['docNo']);
@@ -46,12 +48,12 @@ try {
     $update->execute([$status, $docNo]);
 
     if ($response['status']) {
-        saveDocTransactionLogs($c, $docNo, $currentStep, $status, $currentOffice, $user, $remarks);
+        saveDocTransactionLogs($c, $docNo, $currentStep, $status, $currentOffice, $user, $remarks === "" ? null : $remarks);
 
         $getTstamp = $c->prepare("SELECT tstamp FROM document_transaction_logs WHERE doc_number=? AND step=?");
         $getTstamp->execute([$docNo, $currentStep]);
 
-        // $c->commit();
+        $c->commit();
 
         $response['does_next_step'] = $doesNextStep;
         $response['status'] = $status;
@@ -59,6 +61,7 @@ try {
         $response['remarks'] = $remarks == "" ? "-" : $remarks;
     }
 } catch (PDOException $e) {
+    $c->rollBack();
     $response['status'] = false;
     $response['message'] = $e->getMessage();
 }

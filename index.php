@@ -3,24 +3,10 @@ session_start();
 if (empty($_SESSION['user_id'])) {
 	session_destroy();
 	header('location: login.php');
-} else {
-	// if ($_SESSION['is_admin'] == 0) {
-	// 	header('location: index-u.php');
-	// }
 }
 
 require_once "conn.php";
 
-// $q = $c->prepare("
-//     SELECT
-//         	b.name AS user_name,
-// 			b.email,
-// 			b.first_name,
-// 			a.username
-//     FROM user_accounts a
-//     LEFT JOIN users b ON a.user_id = b.id
-//     WHERE a.is_admin = 1 AND a.id = ?
-// ");
 $q = $c->prepare("
     SELECT
         	b.name AS user_name,
@@ -31,8 +17,19 @@ $q = $c->prepare("
     LEFT JOIN users b ON a.user_id = b.id
     WHERE a.id = ?
 ");
-$q->execute([$_SESSION['user_id']]);
+$q->execute([$_SESSION['user_account_id']]);
 $userInfo = $q->fetch();
+
+if ($_SESSION['is_office_personnel'] == 1) {
+	$getOffice = $c->prepare("SELECT id, office_code, office_name FROM offices WHERE person_in_charge = ?;");
+	$getOffice->execute([$_SESSION['user_id']]);
+	$office = $getOffice->fetch();
+
+	if (isset($office)) {
+		$_SESSION['office_id'] = $office['id'];
+	}
+}
+
 ?>
 
 
@@ -97,7 +94,23 @@ $userInfo = $q->fetch();
 					<ul class="nav nav-secondary">
 						<?php if ($_SESSION['is_admin'] == 0) { ?>
 							<?php if ($_SESSION['is_office_personnel'] == 0) { ?>
-
+								<!-- submitter dashboard -->
+								<li id="parent-dashboard" class="nav-item active">
+									<a data-bs-toggle="collapse" href="#dashboard">
+										<i class="fas fa-home"></i>
+										<p>Dashboard</p>
+										<span class="caret"></span>
+									</a>
+									<div class="collapse show" id="dashboard">
+										<ul class="nav nav-collapse">
+											<li class="sub-menu cursor-pointer active">
+												<a id="default-menu" data-parent="dashboard" data-url="pages/dashboard/submitter-dashboard/submitter-dashboard.php" onclick="loadMenu('pages/dashboard/submitter-dashboard/submitter-dashboard.php','default')">
+													<span class="sub-item">Home</span>
+												</a>
+											</li>
+										</ul>
+									</div>
+								</li>
 							<?php } else { ?>
 								<!-- office personnel dashboard -->
 								<li id="parent-dashboard" class="nav-item active">
@@ -109,26 +122,8 @@ $userInfo = $q->fetch();
 									<div class="collapse show" id="dashboard">
 										<ul class="nav nav-collapse">
 											<li class="sub-menu cursor-pointer active">
-												<a id="default-menu" data-parent="dashboard" data-url="pages/dashboard/admin-dashboard/admin-dashboard.php" onclick="loadMenu('pages/dashboard/admin-dashboard/admin-dashboard.php','default')">
-													<span class="sub-item">Home Panel</span>
-												</a>
-											</li>
-										</ul>
-									</div>
-								</li>
-
-								<!-- office personnel transactions -->
-								<li id="parent-transactions" class="nav-item">
-									<a data-bs-toggle="collapse" href="#transactions">
-										<i class="fas fas fa-receipt"></i>
-										<p>Transactions</p>
-										<span class="caret"></span>
-									</a>
-									<div class="collapse" id="transactions">
-										<ul class="nav nav-collapse">
-											<li class="sub-menu cursor-pointer">
-												<a id="doc-submission-menu" data-parent="transactions" data-url="pages/transactions/doc-submission/doc-submission.php" onclick="loadMenu('pages/transactions/doc-submission/doc-submission.php','doc-submission')">
-													<span class="sub-item">Document Submission</span>
+												<a id="default-menu" data-parent="dashboard" data-url="pages/dashboard/office-dashboard/office-dashboard.php" onclick="loadMenu('pages/dashboard/office-dashboard/office-dashboard.php','default')">
+													<span class="sub-item">Home</span>
 												</a>
 											</li>
 										</ul>
@@ -147,7 +142,7 @@ $userInfo = $q->fetch();
 									<ul class="nav nav-collapse">
 										<li class="sub-menu cursor-pointer active">
 											<a id="default-menu" data-parent="dashboard" data-url="pages/dashboard/admin-dashboard/admin-dashboard.php" onclick="loadMenu('pages/dashboard/admin-dashboard/admin-dashboard.php','default')">
-												<span class="sub-item">Home Panel</span>
+												<span class="sub-item">Home</span>
 											</a>
 										</li>
 									</ul>
@@ -296,36 +291,112 @@ $userInfo = $q->fetch();
 								<a class="nav-link dropdown-toggle" id="notifDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 									<div class="d-flex align-items-center justify-content-center bg-light rounded-circle" style="width: 40px; height: 40px;">
 										<i class="fa fa-bell"></i>
-										<span id="_notif-count" class="notification bg-danger">
-											99+
-										</span>
+										<span id="_notif-count" class="notification bg-danger" hidden></span>
 									</div>
 								</a>
 								<div id="_notifs" class="dropdown-menu dropdown-menu-end navbar-dropdown bg-white border shadow rounded-3" style="width: 360px">
-									<div class="dropdown-header px-3 py-2">
+									<div class="dropdown-header px-3 py-2 border-bottom">
 										<div class="d-flex justify-content-between align-items-center">
 											<h6 class="mb-0 fw-bold">Notifications</h6>
-											<button id="btn-read-notifs" class="btn btn-link text-primary p-0 fw-semibold" style="font-size: 13px" onclick="readAdminNotif('1')">
-												<i class="fa fa-check-double me-1"></i>Mark all as read
-											</button>
+											<?php if (!isset($office)) { ?>
+												<button id="btn-read-notifs" class="btn btn-link text-primary p-0 fw-semibold" style="font-size: 13px" onclick="readNotif(1)" hidden>
+													<i class="fa fa-check-double me-1"></i>Mark all as read
+												</button>
+											<?php } ?>
 										</div>
 									</div>
 									<div class="dropdown-body" style="max-height: 400px; overflow-y: auto;">
-										<div id="notifications-empty" class="text-center py-4 d-none">
-											<div class="text-muted">
-												<i class="fa fa-bell-slash fa-2x mb-2"></i>
-												<p class="mb-0">No new notifications</p>
-											</div>
+										<div id="no-notifications" class="text-center p-4" hidden>
+											<i class="fas fa-bell-slash fa-2x text-muted mb-3"></i>
+											<p class="text-muted mb-0">No new notifications.</p>
 										</div>
-										<div id="_tbl-notifs">
-											<!-- Notifications will be dynamically inserted here -->
+										<div id="_notifications">
+											<!-- show notifications here -->
+
+											<!-- <div class="notification-item p-3 border-bottom">
+												<div class="d-flex">
+													<div class="icon me-3">
+														<i class="fas fa-file-alt fa-lg text-primary"></i>
+													</div>
+													<div class="content flex-grow-1">
+														<h6 class="mb-1">New Document Submitted</h6>
+														<p class="text-muted small mb-2">Document #DOC-2024-001 has been submitted for review.</p>
+														<span class="text-muted smaller">2 mins ago</span>
+														<a class="d-block mt-1 cursor-pointer" onclick="showDocStats('DOC-2024-001')">View Document</a>
+													</div>
+													<div class="actions">
+														<button class="btn btn-link text-muted p-0" onclick="">
+															<i class="fas fa-times"></i>
+														</button>
+													</div>
+												</div>
+											</div>
+
+											<div class="notification-item p-3 border-bottom">
+												<div class="d-flex">
+													<div class="icon me-3">
+														<i class="fas fa-share fa-lg text-info"></i>
+													</div>
+													<div class="content flex-grow-1">
+														<h6 class="mb-1">Document Forwarded</h6>
+														<p class="text-muted small mb-2">Document #DOC-2024-004 has been forwarded to the next department.</p>
+														<span class="text-muted smaller">30 mins ago</span>
+														<a class="d-block mt-1 cursor-pointer" onclick="showDocStats('DOC-2024-004')">View Document</a>
+													</div>
+													<div class="actions">
+														<button class="btn btn-link text-muted p-0" onclick="">
+															<i class="fas fa-times"></i>
+														</button>
+													</div>
+												</div>
+											</div>
+
+											<div class="notification-item p-3 border-bottom">
+												<div class="d-flex">
+													<div class="icon me-3">
+														<i class="fas fa-check-circle fa-lg text-success"></i>
+													</div>
+													<div class="content flex-grow-1">
+														<h6 class="mb-1">Document Approved</h6>
+														<p class="text-muted small mb-2">Document #DOC-2024-002 has been approved.</p>
+														<span class="text-muted smaller">1 hour ago</span>
+														<a class="d-block mt-1 cursor-pointer" onclick="showDocStats('DOC-2024-002')">View Document</a>
+													</div>
+													<div class="actions">
+														<button class="btn btn-link text-muted p-0" onclick="">
+															<i class="fas fa-times"></i>
+														</button>
+													</div>
+												</div>
+											</div>
+
+											<div class="notification-item p-3 border-bottom">
+												<div class="d-flex">
+													<div class="icon me-3">
+														<i class="fas fa-exclamation-circle fa-lg text-danger"></i>
+													</div>
+													<div class="content flex-grow-1">
+														<h6 class="mb-1">Document Rejected</h6>
+														<p class="text-muted small mb-2">Document #DOC-2024-003 has been rejected. Please review comments.</p>
+														<span class="text-muted smaller">2 hours ago</span>
+														<a class="d-block mt-1 cursor-pointer" onclick="showDocStats('DOC-2024-003')">View Document</a>
+													</div>
+													<div class="actions">
+														<button class="btn btn-link text-muted p-0" onclick="">
+															<i class="fas fa-times"></i>
+														</button>
+													</div>
+												</div>
+											</div> -->
 										</div>
 									</div>
-									<div class="dropdown-footer border-top p-2 text-center">
-										<a href="#" class="text-primary text-decoration-none fw-semibold" style="font-size: 14px">
+
+									<div class="dropdown-footer border-top p-2 text-center cursor-pointer">
+										<a class="text-primary text-decoration-none fw-semibold" style="font-size: 14px">
 											See All Notifications
 										</a>
 									</div>
+									</script>
 								</div>
 							</li>
 
@@ -347,7 +418,10 @@ $userInfo = $q->fetch();
 											<div>
 												<h6 class="mb-1"><?= $userInfo['user_name'] ?></h6>
 												<p class="text-muted small mb-2"><?= $userInfo['email'] ?></p>
-												<button class="btn btn-sm btn-light cursor-pointer" onclick="showUserProfileModalContent('<?= $_SESSION['user_id'] ?>')">
+												<?php if (isset($office)) { ?>
+													<p class="text-primary small mb-2"><?= $office['office_name'] ?></p>
+												<?php } ?>
+												<button class="btn btn-sm btn-light cursor-pointer" onclick="showUserProfileModalContent('<?= $_SESSION['user_account_id'] ?>')">
 													<i class="fas fa-key me-1"></i>Change Password
 												</button>
 											</div>
@@ -394,7 +468,7 @@ $userInfo = $q->fetch();
 					<!-- end -->
 
 					<!-- container content -->
-					<div id="_container" class="row">
+					<div id="_container" class="row" u="<?= $_SESSION['user_id'] ?>" of="<?= isset($office) ? $_SESSION['office_id'] : "" ?>">
 						<!-- show contents here -->
 					</div>
 					<!-- end -->
@@ -416,15 +490,13 @@ $userInfo = $q->fetch();
 			<!-- put global modals here -->
 
 			<!-- User Profile Modal -->
-			<form id="user-profile-form">
-				<div class="modal fade modal-reset" id="user-profile-modal" tabindex="-1" role="dialog" aria-hidden="true">
-					<div class="modal-dialog modal-sm" role="document">
-						<div class="modal-content" id="_modal-details">
-							<!-- show modal details here -->
-						</div>
+			<div class="modal fade" id="update-user-profile-modal" tabindex="-1" role="dialog" aria-hidden="true">
+				<div class="modal-dialog modal-sm" role="document">
+					<div id="_modal-content" class="modal-content modal-reset">
+						<!-- show modal content here -->
 					</div>
 				</div>
-			</form>
+			</div>
 			<!-- end -->
 		</div>
 
@@ -467,7 +539,15 @@ $userInfo = $q->fetch();
 
 	<script>
 		$(document).ready(function() {
-			// getAdminNotifs();
+			<?php if ($_SESSION['is_admin'] == 0) { ?>
+				<?php if ($_SESSION['is_office_personnel'] == 0) { ?>
+					submitterNotifs();
+				<?php } else { ?>
+					officeNotifs();
+				<?php } ?>
+			<?php } else { ?>
+				adminNotifs();
+			<?php } ?>
 
 			$(`.nav-item`).on("click", function() {
 				$(`.nav-item`).removeClass("active");
@@ -483,9 +563,35 @@ $userInfo = $q->fetch();
 				e.stopPropagation();
 			});
 
-			// setInterval(() => {
-			// 	getAdminNotifs();
-			// }, 18000);
+			$(document).ready(function() {
+				// Initially show only 10 notifications
+				$('.notification-item').hide();
+				$('.notification-item:lt(10)').show();
+
+				// Handle "See All Notifications" click
+				$('.dropdown-footer a').click(function(e) {
+					e.preventDefault();
+					if ($(this).text().trim() === 'See All Notifications') {
+						$('.notification-item').show();
+						$(this).text('Show Less');
+					} else {
+						$('.notification-item:gt(9)').hide();
+						$(this).text('See All Notifications');
+					}
+				});
+			});
+
+			setInterval(() => {
+				<?php if ($_SESSION['is_admin'] == 0) { ?>
+					<?php if ($_SESSION['is_office_personnel'] == 0) { ?>
+						submitterNotifs();
+					<?php } else { ?>
+						officeNotifs();
+					<?php } ?>
+				<?php } else { ?>
+					adminNotifs();
+				<?php } ?>
+			}, 18000);
 		})
 	</script>
 </body>

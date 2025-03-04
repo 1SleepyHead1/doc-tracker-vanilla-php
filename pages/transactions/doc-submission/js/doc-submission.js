@@ -200,9 +200,4 @@ async function showQRCode(id) {
 		console.error(errorMessages[jqXHR.status] || `Unexpected Error: ${textStatus}, ${errorThrown}`);
 	});
 }
-
-function showDocStats(dn) {
-	window.open(`docstats.php?dn=${dn}`, "_blank");
-}
-
 // end for qr codes

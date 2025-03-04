@@ -85,7 +85,10 @@ try {
                 </div>
                 <div class="col-md-3">
                     <label for="contact-no" class="form-label small">Contact No.</label>
-                    <input type="tel" class="form-control form-control-md" id="contact-no" name="contact-no" value="<?= $action == 1 ? $details['contact_no'] : '' ?>" required>
+                    <div class="input-group">
+                        <span class="input-group-text">+63</span>
+                        <input type="tel" class="form-control form-control-md" id="contact-no" name="contact-no" value="<?= $action == 1 ? substr($details['contact_no'], 3) : '' ?>" min="10" max="10" placeholder="9XX XXX XXXX" required>
+                    </div>
                 </div>
                 <div class="col-md-3">
                     <label for="province" class="form-label small">Province</label>

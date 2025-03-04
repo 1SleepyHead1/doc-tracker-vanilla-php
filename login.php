@@ -2,11 +2,7 @@
 session_start();
 
 if (!empty($_SESSION['user_id'])) {
-    if ($_SESSION['is_admin'] == 0) {
-        header('location: index-u.php');
-    } else {
-        header('location: index.php');
-    }
+    header('location: index.php');
 }
 
 ?>

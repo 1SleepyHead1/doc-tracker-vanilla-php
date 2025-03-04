@@ -113,7 +113,7 @@ function insertUpdateUser(action, id = null) {
 	const province = $("#province").val();
 	const city = $("#city").val();
 	const barangay = $("#barangay").val();
-	const contactNumber = $("#contact-no").val();
+	const contactNumber = `+63${$("#contact-no").val()}`;
 	const userCategory = $(`.user-category.active`).data("category");
 
 	$.post(

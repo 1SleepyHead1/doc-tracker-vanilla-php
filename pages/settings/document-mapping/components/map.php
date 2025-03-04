@@ -49,10 +49,14 @@ try {
                 <li class="<?= $index % 2 == 0 ? "" : "timeline-inverted"  ?>">
                     <div class="timeline-panel">
                         <div class="timeline-heading">
-                            <h4 class="timeline-title"><i class="fas fa-map-pin"></i> <?= $setting['office_code'] ?> - <?= $setting['office_name'] ?></h4>
+                            <h4 class="timeline-title">
+                                <!-- <i class="fas fa-map-pin"></i> -->
+                                <?= $setting['office_code'] ?> - <?= $setting['office_name'] ?>
+                            </h4>
                         </div>
                         <div class="timeline-body">
-                            <p><?= is_null($setting['name']) ? "-" : $setting['name'] ?></p>
+                            <i class="fas fa-user me-1"></i>
+                            <?= is_null($setting['name']) ? "-" : $setting['name'] ?>
                         </div>
                     </div>
                     <div class="timeline-badge"><?= $setting['step'] ?></div>

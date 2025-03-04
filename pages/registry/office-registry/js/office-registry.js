@@ -69,7 +69,7 @@ function refreshPersonnelList() {
 			if (users) {
 				$("#office-personnel-list").empty();
 				users.forEach((user) => {
-					$("#office-personnel-list").append(`<option data-id="${user.id}" value="${user.name}">${user.name}</option>`);
+					$("#office-personnel-list").append(`<option data-id="${user.id}" value="${user.name}"></option>`);
 				});
 			}
 		}

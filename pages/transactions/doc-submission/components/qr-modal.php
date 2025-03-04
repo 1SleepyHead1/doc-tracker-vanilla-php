@@ -9,7 +9,6 @@ try {
     $uploadDir = "../../../../assets/uploads/qr-codes/";
     $id = $_POST['id'];
 
-
     $getDocNo = $c->prepare("SELECT doc_number FROM submitted_documents WHERE id = ?");
     $getDocNo->execute([$id]);
     $docNo = $getDocNo->fetchColumn();
@@ -33,14 +32,6 @@ try {
         </button>
         <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal">Close</button>
     </div>
-
-    <script>
-        $("#doc-entry-form").submit(function(e) {
-            e.preventDefault();
-            <?= $action == 0 ? "insertUpdateDocument(0)" : "insertUpdateDocument(1,$id)" ?>
-        });
-    </script>
-
 <?php
     sleep(1);
 } catch (\Throwable $e) {

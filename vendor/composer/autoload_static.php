@@ -7,6 +7,10 @@ namespace Composer\Autoload;
 class ComposerStaticInit5726834464b54df5c26cde494ec31af2
 {
     public static $prefixLengthsPsr4 = array (
+        'T' => 
+        array (
+            'Twilio\\' => 7,
+        ),
         'E' => 
         array (
             'Endroid\\QrCode\\' => 15,
@@ -22,6 +26,10 @@ class ComposerStaticInit5726834464b54df5c26cde494ec31af2
     );
 
     public static $prefixDirsPsr4 = array (
+        'Twilio\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/twilio/sdk/src/Twilio',
+        ),
         'Endroid\\QrCode\\' => 
         array (
             0 => __DIR__ . '/..' . '/endroid/qr-code/src',
