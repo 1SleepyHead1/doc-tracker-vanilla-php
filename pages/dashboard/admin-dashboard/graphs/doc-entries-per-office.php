@@ -30,7 +30,6 @@ try {
                 doc.id,
                 doc.doc_number,
                 doc.doc_type,
-                MAX(log.step) AS step,
                 MAX(log.step) + 1 AS current_step,
                 user.name as submitter,
                 doc_type.doc_type_name,
@@ -48,11 +47,11 @@ try {
         $getDocuments->execute([$settings, $from, $to]);
         $docs = $getDocuments->fetchAll();
 
-        $checkDocumentInLogs = $c->prepare("SELECT id FROM document_transaction_logs WHERE doc_number=? AND step=? AND office=?;");
+        $checkDocumentInLogs = $c->prepare("SELECT id FROM document_transaction_logs WHERE doc_number=? AND office=?;");
         $checkDocumentInOffice = $c->prepare("SELECT id FROM document_transaction_setting WHERE doc_type = ? AND step = ? AND office = ?;");
 
         foreach ($docs as $doc) {
-            $checkDocumentInLogs->execute([$doc['doc_number'], $doc['step'], $office]);
+            $checkDocumentInLogs->execute([$doc['doc_number'], $office]);
 
             if ($checkDocumentInLogs->rowCount() > 0) {
                 $count++;

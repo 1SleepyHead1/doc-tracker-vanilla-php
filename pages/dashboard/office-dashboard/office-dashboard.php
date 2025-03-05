@@ -10,9 +10,6 @@ require_once "../../../script/globals.php";
 try {
     $userId = $_SESSION['user_id'];
     $officeId = $_SESSION['office_id'];
-    $statuses = ['new', 'forwarded', 'for_release', 'rejected'];
-    $submittedCount = [];
-
 ?>
 
     <div class="container-fluid">
@@ -103,7 +100,7 @@ try {
                                     </div> -->
                                     <div class="col-md-2">
                                         <label for="doc-status-a" class="form-label">Action Taken</label>
-                                        <select class="form-select form-control form-control-sm" id="doc-status-a" name="doc-status-a" onchange="">
+                                        <select class="form-select form-control form-control-sm" id="doc-status-a" name="doc-status-a" onchange="loadDocHandled()">
                                             <option value="">All</option>
                                             <option value="Forwarded">Forwarded</option>
                                             <option value="For Release">For Release</option>
@@ -173,6 +170,13 @@ try {
     </div>
 
     <script src="pages/dashboard/office-dashboard/js/office-dashboard.js"> </script>
+    <script>
+        $(document).ready(function() {
+            loadDocCounts();
+            loadDocHandled();
+            loadDocSubmissions();
+        });
+    </script>
 <?php
     sleep(1);
 } catch (\Throwable $e) {

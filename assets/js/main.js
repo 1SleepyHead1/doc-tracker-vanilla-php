@@ -450,6 +450,12 @@ const getPageHeader = (menu) => {
 			subTitle = "Document Submission";
 			parent = "transactions";
 			break;
+		case "doc-entries-report":
+			title = "Reports";
+			icon = "fas fa-copy";
+			subTitle = "Document Entries Report";
+			parent = "reports";
+			break;
 		default:
 			title = "Dashboard";
 			icon = "fas fa-home";
@@ -663,20 +669,37 @@ const donwloadQrCode = (f) => {
 	document.body.removeChild(link);
 };
 
-const previewPrint = (e) => {
+function previewPrint(e) {
 	const content = $(`#${e}`).html();
-	const myWindow = window.open("", "Print", "height=600,width=800");
+	const myWindow = window.open("", "Print", "height=800,width=1000");
 
 	myWindow.document.write(`
         <html>
             <head>
                 <title>Print</title>
                 <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
-                <link rel="stylesheet" href="assets/css/plugins.min.css" />
-                <link rel="stylesheet" href="assets/css/style.min.css" />
-                <script src="assets/js/core/bootstrap.min.js"></script>
+				<link rel="stylesheet" href="assets/css/plugins.min.css" />
+				<link rel="stylesheet" href="assets/css/style.min.css" />
+				<script src="assets/js/core/bootstrap.min.js"></script>
+                <style>
+                    @media print {
+                        body {
+                            margin: 0;
+                            padding: 20px;
+                        }
+                        .table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+                        .table th, .table td {
+                            border: 1px solid #000;
+                            padding: 8px;
+                            text-align: left;
+                        }
+                    }
+                </style>
             </head>
-            <body class="te d-flex justify-content-center align-items-center" style="-webkit-print-color-adjust:exact; height:100vh;">
+            <body style="-webkit-print-color-adjust:exact;">
                 ${content}
             </body>
         </html>
@@ -691,7 +714,7 @@ const previewPrint = (e) => {
 	};
 
 	return true;
-};
+}
 
 const previewPrintChart = (e) => {
 	// Get the canvas element
@@ -783,8 +806,8 @@ const loginAttempt = () => {
 	});
 };
 
-const logout = () => {
-	$.post(`script/actions/logout.php`, {}, function (data) {
+const logout = (a = 0) => {
+	$.post(`script/actions/logout.php`, { a: a }, function (data) {
 		if (data === "s") {
 			sessionStorage.clear();
 			window.location = "login.php";
@@ -881,23 +904,28 @@ const updateProfile = (id) => {
 		return;
 	}
 
-	if (confirmPword != pword) {
-		showAlert("New and confirm password does not match.", "danger");
+	if (cword === pword) {
+		showAlert("Cannot use the same password.", "danger");
+		return;
+	}
+
+	if (pword !== confirmPword) {
+		showAlert("Passwords do not match.", "danger");
 		return;
 	}
 
 	$.post(
-		`views/user-profile/a/u.php`,
+		`pages/user-profile/scripts/update.php`,
 		{
-			// uname: uname,
 			cword: cword,
 			pword: pword,
 			id: id
 		},
 		function (data) {
-			if (data === "s") {
+			const response = JSON.parse(data);
+			if (response.status) {
 				showAlert("Password has been changed.");
-				toggleModal("user-profile-modal", 1);
+				toggleModal("update-user-profile-modal", 1);
 			} else {
 				showAlert(data, "danger");
 			}
@@ -1189,15 +1217,14 @@ const submitterNotifs = async () => {
 };
 // end notifs
 
-const dbBackup = () => {
-	$.post(`script/a/db-backup/create-file.php`, {}, function (data) {
-		const res = JSON.parse(data);
-		if (res.status == 200) {
-			// window.open(`sql/backup/${res.file_name}`, "_blank");
-			const e = document.getElementById("db-backup");
-			e.click();
-		} else {
-			showAlert(data, "danger");
+// login track
+const tracking = () => {
+	const e = $("#_container");
+	$.post(`script/actions/t.php`, { id: e.attr("ua"), token: e.attr("token") }, function (data) {
+		const response = JSON.parse(data);
+
+		if (!response.status) {
+			logout(1);
 		}
 	}).fail(function (jqXHR, textStatus, errorThrown) {
 		const errorMessages = {
@@ -1210,3 +1237,33 @@ const dbBackup = () => {
 		console.error(errorMessages[jqXHR.status] || `Unexpected Error: ${textStatus}, ${errorThrown}`);
 	});
 };
+// end of login track
+
+// for qr scanning
+const showQrScanModalContent = async () => {
+	try {
+		const container = $(`#capture-qr-modal`).find(`div[id="_capture-qr-modal"]`);
+		const response = await $.ajax({
+			url: `pages/scan-qr/scan-qr.php`,
+			type: "POST"
+		});
+
+		container.html(response);
+		await toggleModal("capture-qr-modal");
+	} catch (error) {
+		if (error.status == 500) {
+			console.error("Internal Server Error (500) occurred.");
+		} else if (error.status == 404) {
+			console.error("Resource not found (404) error.");
+		} else if (error.status == 403) {
+			console.error("Forbidden (403) error.");
+		} else if (error.status == 401) {
+			console.error("Unauthorized (401) error.");
+		} else if (error.status == 400) {
+			console.error("Bad Request (400) error.");
+		} else {
+			console.error("Unexpected Error:", error);
+		}
+	}
+};
+// end for qr scanning

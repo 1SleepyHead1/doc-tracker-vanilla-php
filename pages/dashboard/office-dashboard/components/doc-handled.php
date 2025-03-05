@@ -11,7 +11,7 @@ try {
     $officeId = $_POST['officeId'];
     $docStatus = $_POST['docStatus'];
 
-    $docStatus = $docStatus === "" ? "" : "AND doc.status = '$docStatus'";
+    $docStatus = $docStatus === "" ? "" : "AND log.status = '$docStatus'";
 
     $getDocuments = $c->prepare("
        SELECT

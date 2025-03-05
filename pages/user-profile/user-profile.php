@@ -60,6 +60,8 @@ try {
         $(document).ready(function() {
             $("#update-user-profile-form").submit(function(e) {
                 e.preventDefault();
+
+                updateProfile(<?= $id ?>);
             });
 
 

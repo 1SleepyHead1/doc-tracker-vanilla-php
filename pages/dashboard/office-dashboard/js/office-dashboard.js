@@ -5,10 +5,6 @@ $(document).ready(function () {
 	// loadDocEntries();
 	loadDocSubmissions();
 	loadDocHandled();
-
-	setInterval(() => {
-		loadDocCounts();
-	}, 18000);
 });
 
 var mainParentElement = $("#_docs");
@@ -84,7 +80,7 @@ function loadDocHandled() {
 	// const dateFrom = $("#date-from-b").val();
 	// const dateTo = $("#date-to-b").val();
 	const officeId = mainParentElement.attr("of");
-	const docStatus = $("#doc-status-b").val();
+	const docStatus = $("#doc-status-a").val();
 
 	loader(parentElement);
 	$.post(`pages/dashboard/office-dashboard/components/doc-handled.php`, { officeId: officeId, docStatus: docStatus }, function (data) {

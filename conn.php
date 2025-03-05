@@ -10,6 +10,7 @@ try {
     $c->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
     $c->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $c->setAttribute(PDO::FETCH_ASSOC, true);
+    $c->exec("SET time_zone = '+08:00'");
 } catch (PDOException $e) {
     echo "Connection failed: " . $e->getMessage();
 }

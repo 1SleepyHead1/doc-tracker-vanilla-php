@@ -4,7 +4,6 @@ session_start();
 if (!empty($_SESSION['user_id'])) {
     header('location: index.php');
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="auto">
@@ -136,6 +135,23 @@ if (!empty($_SESSION['user_id'])) {
     <script src="assets/js/main.js"></script>
 
     <script>
+        <?php if (isset($_SESSION['is_logged_in']) && $_SESSION['is_logged_in'] == 1) { ?>
+            swal({
+                title: "Notice!",
+                text: "Your account has been logged on to somewhere else.",
+                icon: "warning",
+                buttons: {
+                    confirm: {
+                        text: "Confirm",
+                        className: "btn btn-warning"
+                    }
+                },
+                closeOnEsc: false,
+                closeOnClickOutside: false
+            });
+        <?php } ?>
+
+        <?php ?>
         $(document).ready(function() {
             $("#show-pass").click(function() {
                 if ($(this).is(":checked")) {

@@ -249,7 +249,7 @@ try {
                                         <input type="date" id="dept-date-to" class="form-control form-control-sm" value="<?= date('Y-m-d') ?>" onchange="loadDocEntriesPerType()">
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="dept-types" class="form-label">Office</label>
+                                        <label for="dept-types" class="form-label">Document Type</label>
                                         <select class="form-select form-control form-control-sm" id="dept-types" name="dept-types" onchange="loadDocEntriesPerType()" multiple>
                                             <?php foreach ($docTypes as $docType) { ?>
                                                 <option value="<?= $docType['id'] ?>"><?= $docType['doc_type_name'] ?></option>

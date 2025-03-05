@@ -116,6 +116,20 @@ function saveDocTransactionLogs($c, $docNo, $step = 0, $status = "New", $office 
     $query->execute([$docNo, $step, $status, $office, $updatedBy, $remarks]);
 }
 
+function saveLoginLogs($c, $token, $userAccount)
+{
+    $check = $c->prepare("SELECT id FROM login_logs WHERE user_account_id=?;");
+    $check->execute([$userAccount]);
+
+    if ($check->rowCount() > 0) {
+        $reset = $c->prepare("DELETE FROM login_logs WHERE user_account_id=?;");
+        $reset->execute([$userAccount]);
+    }
+
+    $query = $c->prepare("INSERT INTO login_logs(token,user_account_id) VALUES(?,?);");
+    $query->execute([$token, $userAccount]);
+}
+
 function getLogsStamp($timestamp)
 {
     $currentTime = time();

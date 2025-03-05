@@ -126,6 +126,11 @@ if ($_SESSION['is_office_personnel'] == 1) {
 													<span class="sub-item">Home</span>
 												</a>
 											</li>
+											<li class="sub-menu cursor-pointer">
+												<a class="" onclick="showQrScanModalContent()">
+													<span class="sub-item">Scan QR Code</span>
+												</a>
+											</li>
 										</ul>
 									</div>
 								</li>
@@ -143,6 +148,11 @@ if ($_SESSION['is_office_personnel'] == 1) {
 										<li class="sub-menu cursor-pointer active">
 											<a id="default-menu" data-parent="dashboard" data-url="pages/dashboard/admin-dashboard/admin-dashboard.php" onclick="loadMenu('pages/dashboard/admin-dashboard/admin-dashboard.php','default')">
 												<span class="sub-item">Home</span>
+											</a>
+										</li>
+										<li class="sub-menu cursor-pointer">
+											<a class="" onclick="showQrScanModalContent()">
+												<span class="sub-item">Scan QR Code</span>
 											</a>
 										</li>
 									</ul>
@@ -203,11 +213,6 @@ if ($_SESSION['is_office_personnel'] == 1) {
 												<span class="sub-item">Document Transaction Setting</span>
 											</a>
 										</li>
-										<li class="sub-menu cursor-pointer">
-											<a id="sms-notifications-menu" data-parent="settings" data-url="pages/settings/sms-notifications/sms-notifications.php" onclick="loadMenu('pages/settings/sms-notifications/sms-notifications.php','sms-notifications')">
-												<span class="sub-item">SMS Notifications Setting</span>
-											</a>
-										</li>
 									</ul>
 								</div>
 							</li>
@@ -240,14 +245,8 @@ if ($_SESSION['is_office_personnel'] == 1) {
 								<div class="collapse" id="reports">
 									<ul class="nav nav-collapse">
 										<li class="sub-menu cursor-pointer">
-											<a id="cash-d-report-menu" data-parent="reports" data-url="pages/reports/cash-d-report/cash-d-report.php" onclick="loadMenu('views/reports/cash-d-report/cash-d-report.php','cash-d-report')">
-												<span class="sub-item">Cash Donation Report</span>
-											</a>
-										</li>
-
-										<li class="sub-menu cursor-pointer">
-											<a id="inkind-d-report-menu" data-parent="reports" data-url="pages/reports/inkind-d-report/inkind-d-report.php" onclick="loadMenu('views/reports/inkind-d-report/inkind-d-report.php','inkind-d-report')">
-												<span class="sub-item">In-kind Donation Report</span>
+											<a id="doc-entries-report-menu" data-parent="reports" data-url="pages/reports/doc-entries-report/doc-entries-report.php" onclick="loadMenu('pages/reports/doc-entries-report/doc-entries-report.php','doc-entries-report')">
+												<span class="sub-item">Document Entries Report</span>
 											</a>
 										</li>
 									</ul>
@@ -312,82 +311,6 @@ if ($_SESSION['is_office_personnel'] == 1) {
 										</div>
 										<div id="_notifications">
 											<!-- show notifications here -->
-
-											<!-- <div class="notification-item p-3 border-bottom">
-												<div class="d-flex">
-													<div class="icon me-3">
-														<i class="fas fa-file-alt fa-lg text-primary"></i>
-													</div>
-													<div class="content flex-grow-1">
-														<h6 class="mb-1">New Document Submitted</h6>
-														<p class="text-muted small mb-2">Document #DOC-2024-001 has been submitted for review.</p>
-														<span class="text-muted smaller">2 mins ago</span>
-														<a class="d-block mt-1 cursor-pointer" onclick="showDocStats('DOC-2024-001')">View Document</a>
-													</div>
-													<div class="actions">
-														<button class="btn btn-link text-muted p-0" onclick="">
-															<i class="fas fa-times"></i>
-														</button>
-													</div>
-												</div>
-											</div>
-
-											<div class="notification-item p-3 border-bottom">
-												<div class="d-flex">
-													<div class="icon me-3">
-														<i class="fas fa-share fa-lg text-info"></i>
-													</div>
-													<div class="content flex-grow-1">
-														<h6 class="mb-1">Document Forwarded</h6>
-														<p class="text-muted small mb-2">Document #DOC-2024-004 has been forwarded to the next department.</p>
-														<span class="text-muted smaller">30 mins ago</span>
-														<a class="d-block mt-1 cursor-pointer" onclick="showDocStats('DOC-2024-004')">View Document</a>
-													</div>
-													<div class="actions">
-														<button class="btn btn-link text-muted p-0" onclick="">
-															<i class="fas fa-times"></i>
-														</button>
-													</div>
-												</div>
-											</div>
-
-											<div class="notification-item p-3 border-bottom">
-												<div class="d-flex">
-													<div class="icon me-3">
-														<i class="fas fa-check-circle fa-lg text-success"></i>
-													</div>
-													<div class="content flex-grow-1">
-														<h6 class="mb-1">Document Approved</h6>
-														<p class="text-muted small mb-2">Document #DOC-2024-002 has been approved.</p>
-														<span class="text-muted smaller">1 hour ago</span>
-														<a class="d-block mt-1 cursor-pointer" onclick="showDocStats('DOC-2024-002')">View Document</a>
-													</div>
-													<div class="actions">
-														<button class="btn btn-link text-muted p-0" onclick="">
-															<i class="fas fa-times"></i>
-														</button>
-													</div>
-												</div>
-											</div>
-
-											<div class="notification-item p-3 border-bottom">
-												<div class="d-flex">
-													<div class="icon me-3">
-														<i class="fas fa-exclamation-circle fa-lg text-danger"></i>
-													</div>
-													<div class="content flex-grow-1">
-														<h6 class="mb-1">Document Rejected</h6>
-														<p class="text-muted small mb-2">Document #DOC-2024-003 has been rejected. Please review comments.</p>
-														<span class="text-muted smaller">2 hours ago</span>
-														<a class="d-block mt-1 cursor-pointer" onclick="showDocStats('DOC-2024-003')">View Document</a>
-													</div>
-													<div class="actions">
-														<button class="btn btn-link text-muted p-0" onclick="">
-															<i class="fas fa-times"></i>
-														</button>
-													</div>
-												</div>
-											</div> -->
 										</div>
 									</div>
 
@@ -427,10 +350,9 @@ if ($_SESSION['is_office_personnel'] == 1) {
 											</div>
 										</div>
 										<div class="list-group list-group-flush border-top pt-2">
-											<!-- <a class="list-group-item list-group-item-action cursor-pointer" onclick="dbBackup()">
-												<i class="fas fa-database me-2"></i>Backup Database
-											</a>
-											<a id="db-backup" href="sql/backup/rdms_backup.sql cursor-pointer" download="rdms_backup.sql" hidden></a> -->
+											<!-- <a class="list-group-item list-group-item-action cursor-pointer" onclick="showQrScanModalContent()">
+												<i class="fas fa-qrcode me-2"></i>Scan QR Code
+											</a> -->
 											<a class="list-group-item list-group-item-action text-danger cursor-pointer" onclick="logout()">
 												<i class="fas fa-sign-out-alt me-2"></i>Logout
 											</a>
@@ -468,7 +390,7 @@ if ($_SESSION['is_office_personnel'] == 1) {
 					<!-- end -->
 
 					<!-- container content -->
-					<div id="_container" class="row" u="<?= $_SESSION['user_id'] ?>" of="<?= isset($office) ? $_SESSION['office_id'] : "" ?>">
+					<div id="_container" class="row" token="<?= $_SESSION['log_token'] ?>" u="<?= $_SESSION['user_id'] ?>" ua="<?= $_SESSION['user_account_id'] ?>" of="<?= isset($office) ? $_SESSION['office_id'] : "" ?>">
 						<!-- show contents here -->
 					</div>
 					<!-- end -->
@@ -490,14 +412,25 @@ if ($_SESSION['is_office_personnel'] == 1) {
 			<!-- put global modals here -->
 
 			<!-- User Profile Modal -->
-			<div class="modal fade" id="update-user-profile-modal" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal fade modal-reset" id="update-user-profile-modal" tabindex="-1" role="dialog" aria-hidden="true">
 				<div class="modal-dialog modal-sm" role="document">
-					<div id="_modal-content" class="modal-content modal-reset">
+					<div id="_modal-content" class="modal-content">
 						<!-- show modal content here -->
 					</div>
 				</div>
 			</div>
 			<!-- end -->
+
+			<!-- Capture QR Modal -->
+			<div class="modal fade" id="capture-qr-modal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+				<div class="modal-dialog modal-md" role="document">
+					<div id="_capture-qr-modal" class="modal-content">
+						<!-- show modal content here -->
+					</div>
+				</div>
+			</div>
+			<!-- end -->
+
 		</div>
 
 	</div>
@@ -581,6 +514,11 @@ if ($_SESSION['is_office_personnel'] == 1) {
 				});
 			});
 
+
+			setInterval(() => {
+				tracking();
+			}, 15000);
+
 			setInterval(() => {
 				<?php if ($_SESSION['is_admin'] == 0) { ?>
 					<?php if ($_SESSION['is_office_personnel'] == 0) { ?>
@@ -592,7 +530,22 @@ if ($_SESSION['is_office_personnel'] == 1) {
 					adminNotifs();
 				<?php } ?>
 			}, 18000);
-		})
+		});
+
+		// turn off camera
+		$('#capture-qr-modal').on('hidden.bs.modal', function() {
+			const video = document.getElementById('qr-video');
+
+			if (video) {
+				const stream = video.srcObject;
+				if (stream) {
+					const tracks = stream.getTracks();
+					tracks.forEach(track => track.stop());
+				}
+				scanner.stop();
+				video.srcObject = null;
+			}
+		});
 	</script>
 </body>
 
